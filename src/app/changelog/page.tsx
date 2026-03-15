@@ -10,6 +10,19 @@ interface ChangelogEntry {
 
 const ENTRIES: ChangelogEntry[] = [
   {
+    date: "2026-03-15",
+    title: "Collection Claims + Profiles — SDK v0.4.1",
+    tag: "Release",
+    items: [
+      "Collection claim flow — 3 paths: on-chain auto-verify (POST /v1/collections/claim), SNIP-12 challenge/verify (POST /v1/collections/claim/challenge + /verify), and manual email request (POST /v1/collections/claim/request)",
+      "Collection profiles — GET/PATCH /v1/collections/:contract/profile for enriched display metadata (displayName, description, cover image, banner, social links)",
+      "Creator profiles — GET/PATCH /v1/creators/:wallet/profile for per-creator display metadata",
+      "ApiCollection now includes source (MEDIALANE_REGISTRY | EXTERNAL | PARTNERSHIP | IP_TICKET | IP_CLUB | GAME) and claimedBy fields",
+      "SDK v0.4.1: claimCollection(), requestCollectionClaim(), getCollectionProfile(), updateCollectionProfile(), getCreatorProfile(), updateCreatorProfile() methods added to ApiClient",
+      "SDK v0.4.1: ApiCollectionClaim, ApiAdminCollectionClaim, ApiCollectionProfile, ApiCreatorProfile types exported",
+    ],
+  },
+  {
     date: "2026-03-12",
     title: "Backend v0.2.0 + SDK v0.4.0",
     tag: "Release",

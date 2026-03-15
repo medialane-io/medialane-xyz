@@ -253,6 +253,8 @@ export default function ApiReferencePage() {
           { name: "page", type: "number", desc: "Page number" },
           { name: "limit", type: "number", desc: "Items per page" },
           { name: "owner", type: "string", desc: "Filter by collection owner address" },
+          { name: "isKnown", type: "boolean", desc: "true = featured collections only" },
+          { name: "sort", type: "string", desc: '"recent" (default) | "supply" | "floor" | "volume" | "name"' },
         ]}
         curl={`curl "${BASE}/v1/collections?owner=0x0591..." \\
   -H "x-api-key: ${KEY}"`}
@@ -957,6 +959,207 @@ const resumeSource = new EventSource(url, {
         curl={`curl -X DELETE "${BASE}/v1/portal/webhooks/wh_abc" \\
   -H "x-api-key: ${KEY}"`}
         response={`{ "success": true }`}
+      />
+
+      {/* ── COLLECTION CLAIMS ── */}
+      <DocH2 id="claims" border>Collection Claims</DocH2>
+      <p className="text-sm text-muted-foreground mb-6">
+        Claim ownership of an existing Starknet ERC-721 collection. Three verification paths available: automatic on-chain check (requires Clerk JWT), SNIP-12 signature challenge, or manual email review.
+      </p>
+
+      <Endpoint
+        method="POST"
+        path="/v1/collections/claim"
+        description="Path 1: Auto-verify ownership on-chain. Requires both a tenant API key and a Clerk session JWT in the Authorization header. The API checks that the authenticated wallet is the on-chain owner of the contract."
+        params={[
+          { name: "contractAddress", type: "string", required: true, desc: "The ERC-721 contract address to claim" },
+          { name: "walletAddress", type: "string", required: true, desc: "The Starknet wallet address claiming ownership" },
+        ]}
+        curl={`curl -X POST "${BASE}/v1/collections/claim" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "contractAddress": "0x076c...", "walletAddress": "0x03d0..." }'`}
+        response={`{
+  "verified": true,
+  "collection": { "contractAddress": "0x076c...", "name": "My Collection", "claimedBy": "0x03d0..." }
+}
+
+// If not verified:
+{ "verified": false, "reason": "not_owner" }`}
+      />
+
+      <Endpoint
+        method="POST"
+        path="/v1/collections/claim/challenge"
+        description="Path 2 (step 1): Request a SNIP-12 typed-data challenge for a contract address. Sign the returned typedData with your Starknet wallet, then submit to /verify."
+        params={[
+          { name: "contractAddress", type: "string", required: true, desc: "The ERC-721 contract address to claim" },
+          { name: "walletAddress", type: "string", required: true, desc: "The wallet that will sign the challenge" },
+        ]}
+        curl={`curl -X POST "${BASE}/v1/collections/claim/challenge" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "contractAddress": "0x076c...", "walletAddress": "0x03d0..." }'`}
+        response={`{
+  "challengeId": "chal_abc123",
+  "typedData": { "domain": { "name": "Medialane", "version": "1", "revision": "1" }, "..." },
+  "expiresAt": "2026-03-15T16:00:00Z"
+}`}
+      />
+
+      <Endpoint
+        method="POST"
+        path="/v1/collections/claim/verify"
+        description="Path 2 (step 2): Submit the SNIP-12 signature from the challenge step. If valid, the collection is marked as claimed by the wallet."
+        params={[
+          { name: "challengeId", type: "string", required: true, desc: "Challenge ID from /claim/challenge" },
+          { name: "signature", type: "object", required: true, desc: '{ r: string; s: string } — starknet.js signature object' },
+        ]}
+        curl={`curl -X POST "${BASE}/v1/collections/claim/verify" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "challengeId": "chal_abc123", "signature": { "r": "0x...", "s": "0x..." } }'`}
+        response={`{
+  "verified": true,
+  "collection": { "contractAddress": "0x076c...", "claimedBy": "0x03d0..." }
+}`}
+      />
+
+      <Endpoint
+        method="POST"
+        path="/v1/collections/claim/request"
+        description="Path 3: Submit a manual claim request for admin review. No wallet signature required — our team will verify and reach out by email."
+        params={[
+          { name: "contractAddress", type: "string", required: true, desc: "The ERC-721 contract address to claim" },
+          { name: "email", type: "string", required: true, desc: "Email address for review correspondence" },
+          { name: "walletAddress", type: "string", desc: "Optional: your Starknet wallet address" },
+          { name: "notes", type: "string", desc: "Optional: context about your connection to the collection" },
+        ]}
+        curl={`curl -X POST "${BASE}/v1/collections/claim/request" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "contractAddress": "0x076c...", "email": "creator@example.com", "notes": "I deployed this contract in block 7488000" }'`}
+        response={`{
+  "claim": {
+    "id": "clm_xyz",
+    "contractAddress": "0x076c...",
+    "status": "PENDING",
+    "verificationMethod": "MANUAL",
+    "createdAt": "2026-03-15T15:00:00Z"
+  }
+}`}
+      />
+
+      {/* ── PROFILES ── */}
+      <DocH2 id="profiles" border>Profiles</DocH2>
+      <p className="text-sm text-muted-foreground mb-6">
+        Enriched display metadata for collections and creators. Collection profiles can only be updated by the wallet that claimed the collection (requires Clerk JWT). Creator profiles can be updated by the profile owner.
+      </p>
+
+      <Endpoint
+        method="GET"
+        path="/v1/collections/:contract/profile"
+        description="Get the display profile for a collection (displayName, description, cover image, banner, social links). Returns null if no profile has been set."
+        params={[
+          { name: "contract", type: "string", required: true, desc: "NFT contract address" },
+        ]}
+        curl={`curl "${BASE}/v1/collections/0x076c.../profile" \\
+  -H "x-api-key: ${KEY}"`}
+        response={`{
+  "contractAddress": "0x076c...",
+  "chain": "STARKNET",
+  "displayName": "The Revenge of Shiroi",
+  "description": "Music · Video · Concept Art",
+  "image": "ipfs://bafybeif2a...",
+  "bannerImage": "ipfs://bafybeic...",
+  "websiteUrl": "https://shiroi.io",
+  "twitterUrl": "https://x.com/shiroi",
+  "discordUrl": null,
+  "telegramUrl": null,
+  "updatedAt": "2026-03-15T15:00:00Z"
+}`}
+      />
+
+      <Endpoint
+        method="PATCH"
+        path="/v1/collections/:contract/profile"
+        description="Update the display profile for a collection. Requires a Clerk session JWT — the authenticated wallet must be the claimedBy address for this collection."
+        params={[
+          { name: "contract", type: "string", required: true, desc: "NFT contract address (URL param)" },
+          { name: "displayName", type: "string", desc: "Display name (overrides on-chain name)" },
+          { name: "description", type: "string", desc: "Collection description" },
+          { name: "image", type: "string", desc: "Cover image IPFS URI (ipfs://...)" },
+          { name: "bannerImage", type: "string", desc: "Banner image IPFS URI (ipfs://...)" },
+          { name: "websiteUrl", type: "string", desc: "Website URL" },
+          { name: "twitterUrl", type: "string", desc: "Twitter/X URL" },
+          { name: "discordUrl", type: "string", desc: "Discord server URL" },
+          { name: "telegramUrl", type: "string", desc: "Telegram URL" },
+        ]}
+        curl={`curl -X PATCH "${BASE}/v1/collections/0x076c.../profile" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "displayName": "Shiroi Collection", "description": "Music & Concept Art", "websiteUrl": "https://shiroi.io" }'`}
+        response={`{
+  "contractAddress": "0x076c...",
+  "displayName": "Shiroi Collection",
+  "description": "Music & Concept Art",
+  "websiteUrl": "https://shiroi.io",
+  "updatedAt": "2026-03-15T15:05:00Z"
+}`}
+      />
+
+      <Endpoint
+        method="GET"
+        path="/v1/creators/:wallet/profile"
+        description="Get the display profile for a creator wallet (displayName, bio, avatar, banner, social links). Returns null if no profile has been set."
+        params={[
+          { name: "wallet", type: "string", required: true, desc: "Starknet wallet address" },
+        ]}
+        curl={`curl "${BASE}/v1/creators/0x03d0.../profile" \\
+  -H "x-api-key: ${KEY}"`}
+        response={`{
+  "walletAddress": "0x03d0...",
+  "chain": "STARKNET",
+  "displayName": "Kalamaha",
+  "bio": "Visual artist on Starknet",
+  "avatarImage": "ipfs://bafkrei...",
+  "bannerImage": null,
+  "websiteUrl": "https://kalamaha.art",
+  "twitterUrl": "https://x.com/kalamaha",
+  "discordUrl": null,
+  "telegramUrl": null,
+  "updatedAt": "2026-03-15T15:00:00Z"
+}`}
+      />
+
+      <Endpoint
+        method="PATCH"
+        path="/v1/creators/:wallet/profile"
+        description="Update a creator profile. Requires a Clerk session JWT — the authenticated wallet must match the wallet URL parameter."
+        params={[
+          { name: "wallet", type: "string", required: true, desc: "Starknet wallet address (URL param)" },
+          { name: "displayName", type: "string", desc: "Display name or handle" },
+          { name: "bio", type: "string", desc: "Short bio" },
+          { name: "avatarImage", type: "string", desc: "Avatar IPFS URI (ipfs://...)" },
+          { name: "bannerImage", type: "string", desc: "Banner IPFS URI (ipfs://...)" },
+          { name: "websiteUrl", type: "string", desc: "Website URL" },
+          { name: "twitterUrl", type: "string", desc: "Twitter/X URL" },
+          { name: "discordUrl", type: "string", desc: "Discord URL" },
+          { name: "telegramUrl", type: "string", desc: "Telegram URL" },
+        ]}
+        curl={`curl -X PATCH "${BASE}/v1/creators/0x03d0.../profile" \\
+  -H "x-api-key: ${KEY}" \\
+  -H "Authorization: Bearer CLERK_SESSION_JWT" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "displayName": "Kalamaha", "bio": "Visual artist on Starknet" }'`}
+        response={`{
+  "walletAddress": "0x03d0...",
+  "displayName": "Kalamaha",
+  "bio": "Visual artist on Starknet",
+  "updatedAt": "2026-03-15T15:05:00Z"
+}`}
       />
 
       {/* ── TECHNICAL DETAILS ── */}

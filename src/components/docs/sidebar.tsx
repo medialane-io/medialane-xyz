@@ -42,6 +42,8 @@ const NAV: NavSection[] = [
       { label: "Metadata", href: "/docs/api", hash: "#metadata" },
       { label: "Search", href: "/docs/api", hash: "#search" },
       { label: "Events", href: "/docs/api", hash: "#events" },
+      { label: "Claims", href: "/docs/api", hash: "#claims" },
+      { label: "Profiles", href: "/docs/api", hash: "#profiles" },
       { label: "Portal", href: "/docs/api", hash: "#portal" },
       { label: "Webhooks", href: "/docs/api", hash: "#portal" },
       { label: "Health", href: "/docs/api", hash: "#health" },
