@@ -18,6 +18,9 @@ import {
   Zap,
   Sparkles,
   HeartPulse,
+  MessageSquare,
+  GitFork,
+  ArrowLeftRight,
 } from "lucide-react"
 
 const API_CARDS = [
@@ -85,6 +88,30 @@ const API_CARDS = [
     bg: "bg-pink-500/10",
     border: "border-pink-500/20",
   },
+  {
+    icon: MessageSquare,
+    title: "On-chain Comments",
+    description: "Permanent comments anchored to any NFT via the NFTComments Cairo contract. Indexed in real time, Voyager-verifiable, with on-chain 60s rate limiting and report-based auto-moderation.",
+    color: "text-violet-400",
+    bg: "bg-violet-500/10",
+    border: "border-violet-500/20",
+  },
+  {
+    icon: GitFork,
+    title: "Remix Licensing",
+    description: "IP remix offer and self-remix system. Open licenses (CC0, CC BY, CC BY-SA, CC BY-NC) are auto-approved. Custom terms route through a creator approval flow before the requester can mint.",
+    color: "text-rose-400",
+    bg: "bg-rose-500/10",
+    border: "border-rose-500/20",
+  },
+  {
+    icon: ArrowLeftRight,
+    title: "Counter-offers",
+    description: "Buyers can counter any open listing with a custom price, duration, and message using SNIP-12 typed data. Sellers receive structured counter-offers they can accept or ignore.",
+    color: "text-teal-400",
+    bg: "bg-teal-500/10",
+    border: "border-teal-500/20",
+  },
 ]
 
 const WEBHOOK_EVENTS = [
@@ -147,7 +174,9 @@ export default function FeaturesPage() {
                     "Stateless REST — no sessions or cookies",
                     "x-api-key header auth — trivial to integrate",
                     "Deterministic JSON responses",
-                    "No rate limit on PREMIUM — scale without friction",
+                    "Unlimited monthly quota on PREMIUM — scale without friction",
+                    "Detect open-license assets (CC0) and autonomously request remix offers",
+                    "Query on-chain comments and IP metadata without a wallet",
                   ].map((f) => (
                     <li key={f} className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-primary flex-shrink-0" />
