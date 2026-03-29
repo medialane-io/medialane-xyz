@@ -86,10 +86,10 @@ export function PlanTab({ plan }: PlanTabProps) {
             <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4 text-sm text-muted-foreground">
               You have Premium access. View webhook documentation or contact{" "}
               <a
-                href="mailto:api@medialane.io"
+                href="mailto:dao@medialane.org"
                 className="text-primary underline underline-offset-2"
               >
-                api@medialane.io
+                dao@medialane.org
               </a>{" "}
               for enterprise pricing.
             </div>
@@ -119,9 +119,9 @@ export function PlanTab({ plan }: PlanTabProps) {
           </div>
           <DialogFooter className="sm:justify-start gap-2">
             <Button asChild>
-              <a href="mailto:api@medialane.io?subject=Premium%20Access%20Request" target="_blank" rel="noopener noreferrer">
+              <a href="mailto:dao@medialane.org?subject=Premium%20Access%20Request" target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="w-4 h-4 mr-2" />
-                Email api@medialane.io
+                Email dao@medialane.org
               </a>
             </Button>
             <Button variant="ghost" onClick={() => setOpen(false)}>
