@@ -10,6 +10,57 @@ interface ChangelogEntry {
 
 const ENTRIES: ChangelogEntry[] = [
   {
+    date: "2026-03-29",
+    title: "SDK v0.5.3 — Counter-offers + Remix Licensing",
+    tag: "Release",
+    items: [
+      "Counter-offer flow — POST /v1/intents/counter-offer creates a SNIP-12 structured counter-offer with custom price, duration, and optional message. GET /v1/orders/counter-offers lists by originalOrderHash or sellerAddress",
+      "SDK v0.5.x: OrderStatus extended with COUNTER_OFFERED; IntentType extended with COUNTER_OFFER",
+      "SDK v0.5.x: createCounterOfferIntent(params, clerkToken) and getCounterOffers(query) added to ApiClient",
+      "Remix Licensing — full offer + self-remix system. Open licenses (CC0, CC BY, CC BY-SA, CC BY-NC) are auto-approved; custom terms require creator approval before the requester can mint",
+      "SDK v0.5.x: submitRemixOffer(), submitAutoRemixOffer(), confirmSelfRemix(), getRemixOffers(), getRemixOffer(), confirmRemixOffer(), rejectRemixOffer() added to ApiClient",
+      "SDK v0.5.x: RemixOfferStatus, ApiRemixOffer, ApiPublicRemix, OPEN_LICENSES, OpenLicense types exported",
+      "GET /v1/tokens/:contract/:tokenId/remixes — public remix list for any token (no auth required)",
+    ],
+  },
+  {
+    date: "2026-03-22",
+    title: "On-chain NFT Comments",
+    tag: "Feature",
+    items: [
+      "Permanent on-chain comments via NFTComments Cairo contract (mainnet). Any wallet can comment on any indexed token — immutable and Voyager-verifiable",
+      "GET /v1/tokens/:contract/:tokenId/comments — list indexed comments, newest first. Comments with 3+ unique reports are automatically hidden",
+      "Backend indexer polls comment events and skips comments for tokens not in the Medialane registry",
+      "Cairo contract enforces a 60-second per-address rate limit on-chain to prevent spam",
+      "COMMENT added to ReportTargetType — auto-hidden after 3 unique reports",
+      "SDK v0.4.8: ApiComment type and getTokenComments(contract, tokenId, opts?) method",
+    ],
+  },
+  {
+    date: "2026-03-20",
+    title: "Currency Expansion + IP Types & Templates",
+    tag: "Feature",
+    items: [
+      "Currency expansion — WBTC and ETH added as listing/offer currencies. USDC.e removed. Supported set: USDC, USDT, ETH, STRK, WBTC",
+      "12 canonical IP types: Audio, Art, Video, Photography, NFT, Patents, Posts, Publications, Documents, RWA, Software, Custom",
+      "Dynamic template fields per IP type — assets carry structured attributes (licenseType, ipType, type-specific fields) as standard IPFS attributes entries",
+      "Media tab with embed players for YouTube, Spotify, SoundCloud, and TikTok content",
+      "ChipiPay upgraded to v14 — new ChipiWalletPanel component and usePasskeyAuth / usePasskeySetup hooks",
+      "Floor price bug fix — no longer stored as raw wei when consideration token is unknown; correctly stored as null",
+    ],
+  },
+  {
+    date: "2026-03-16",
+    title: "Collection baseUri + Creator Attribution",
+    tag: "Fix",
+    items: [
+      "Create collection flow now uploads collection metadata JSON to IPFS and sets the resulting CID as baseUri on-chain — collection images resolve correctly in dapp.medialane.io",
+      "Asset IPFS metadata now includes a Creator attribute carrying the minter wallet address",
+      "External link fields added to both create-collection and create-asset flows — previously hardcoded to medialane.io",
+      "GET /v1/orders 500 error fixed — $queryRaw enum comparison now uses explicit ::\"OrderStatus\" cast in PostgreSQL",
+    ],
+  },
+  {
     date: "2026-03-15",
     title: "Collection Claims + Profiles — SDK v0.4.1",
     tag: "Release",
