@@ -63,6 +63,42 @@ export default function DocsPage() {
         </li>
       </ol>
 
+      {/* Platform Surfaces */}
+      <section className="mb-12">
+        <DocH2 id="ecosystem" border>Platform Surfaces</DocH2>
+        <p className="text-sm text-muted-foreground mb-6">
+          Medialane has three distinct surfaces. The portal you&apos;re on is for developers. The other two are for end users and autonomous agents.
+        </p>
+        <div className="grid md:grid-cols-3 gap-4">
+          {[
+            {
+              label: "portal.medialane.io",
+              role: "Developer Portal",
+              desc: "API key management, usage dashboard, webhooks, and this documentation. Built for developers integrating the REST API.",
+              accent: "border-primary/30 bg-primary/5",
+            },
+            {
+              label: "www.medialane.io",
+              role: "Creator Launchpad",
+              desc: "Consumer-grade IP marketplace with invisible wallet (ChipiPay). Mint, list, remix, and comment without managing a seed phrase.",
+              accent: "border-cyan-500/20 bg-cyan-500/5",
+            },
+            {
+              label: "dapp.medialane.io",
+              role: "Permissionless dApp",
+              desc: "Fully on-chain reads via starknet.js — no backend dependency. Ideal for Starknet wallet holders and autonomous AI agents.",
+              accent: "border-amber-500/20 bg-amber-500/5",
+            },
+          ].map((s) => (
+            <div key={s.label} className={`rounded-xl border p-5 space-y-2 ${s.accent}`}>
+              <p className="text-xs font-mono text-muted-foreground">{s.label}</p>
+              <p className="text-sm font-semibold text-white">{s.role}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Authentication */}
       <DocH2 id="authentication">Authentication</DocH2>
       <p className="text-muted-foreground mb-3">
