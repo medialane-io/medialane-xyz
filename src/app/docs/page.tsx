@@ -57,7 +57,7 @@ export default function DocsPage() {
           <div>
             <p className="text-white font-medium mb-1">Integrate in your app</p>
             <p className="text-muted-foreground text-sm">
-              Use the <Link href="/docs/sdk" className="text-primary hover:underline">medialane-sdk</Link> for a typed client, or call the REST API directly from any language.
+              Use the <Link href="/docs/sdk" className="text-primary hover:underline">@medialane/sdk</Link> for a typed client, or call the REST API directly from any language.
             </p>
           </div>
         </li>

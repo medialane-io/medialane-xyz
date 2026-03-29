@@ -40,7 +40,7 @@ const client = new MedialaneClient({
   rpcUrl: "https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_7/YOUR_KEY",
   backendUrl: "https://medialane-backend-production.up.railway.app",
   apiKey: "ml_live_YOUR_KEY",
-  marketplaceContract: "0x059deafbbafbf7051c315cf75a94b03c5547892bc0c6dfa36d7ac7290d4cc33a",
+  marketplaceContract: "0x04299b51289aa700de4ce19cc77bcea8430bfd1aef04193efab09d60a3a7ee0f",
   // Optional: configure retry for transient failures
   retryOptions: {
     maxAttempts: 3,      // default

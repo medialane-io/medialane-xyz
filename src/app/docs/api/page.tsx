@@ -123,7 +123,7 @@ export default function ApiReferencePage() {
         params={[
           { name: "status", type: "string", desc: "Filter by status: OPEN | FULFILLED | CANCELLED" },
           { name: "nftContract", type: "string", desc: "Filter by NFT contract address" },
-          { name: "currency", type: "string", desc: "Filter by payment token: USDC | USDC.e | ETH | STRK | USDT" },
+          { name: "currency", type: "string", desc: "Filter by payment token: USDC | USDT | ETH | STRK | WBTC" },
           { name: "sort", type: "string", desc: "Sort field: priceRaw | createdAt" },
           { name: "order", type: "string", desc: "asc | desc (default: desc)" },
           { name: "page", type: "number", desc: "Page number (default: 1)" },
@@ -477,7 +477,7 @@ export default function ApiReferencePage() {
           { name: "nftContract", type: "string", required: true, desc: "NFT contract address" },
           { name: "tokenId", type: "string", required: true, desc: "Token ID" },
           { name: "price", type: "string", required: true, desc: "Price in smallest denomination" },
-          { name: "currency", type: "string", required: true, desc: "USDC | USDC.e | ETH | STRK | USDT" },
+          { name: "currency", type: "string", required: true, desc: "USDC | USDT | ETH | STRK | WBTC" },
           { name: "offerer", type: "string", required: true, desc: "Seller Starknet address" },
         ]}
         curl={`curl -X POST "${BASE}/v1/intents/listing" \\
@@ -509,7 +509,7 @@ export default function ApiReferencePage() {
           { name: "nftContract", type: "string", required: true, desc: "Target NFT contract" },
           { name: "tokenId", type: "string", required: true, desc: "Token ID" },
           { name: "price", type: "string", required: true, desc: "Offer amount in smallest denomination" },
-          { name: "currency", type: "string", required: true, desc: "USDC | USDC.e | ETH | STRK | USDT" },
+          { name: "currency", type: "string", required: true, desc: "USDC | USDT | ETH | STRK | WBTC" },
           { name: "offerer", type: "string", required: true, desc: "Buyer Starknet address" },
         ]}
         curl={`curl -X POST "${BASE}/v1/intents/offer" \\

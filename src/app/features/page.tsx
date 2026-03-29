@@ -193,12 +193,12 @@ export default function FeaturesPage() {
                 <Code2 className="w-8 h-8 text-white" />
               </div>
               <div className="space-y-3 flex-1">
-                <h2 className="text-xl font-bold text-white">medialane-sdk</h2>
+                <h2 className="text-xl font-bold text-white">@medialane/sdk</h2>
                 <p className="text-muted-foreground text-sm">
                   Framework-agnostic TypeScript SDK. On-chain marketplace calls + full REST API client in one package.
                 </p>
                 <div className="rounded-lg bg-black/40 border border-white/10 px-4 py-2.5 font-mono text-sm text-green-300">
-                  bun add medialane-sdk
+                  bun add @medialane/sdk
                 </div>
               </div>
               <Button asChild variant="outline" className="flex-shrink-0 border-white/10 hover:bg-white/5">
