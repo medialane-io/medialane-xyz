@@ -2,22 +2,26 @@ import Link from "next/link"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { Card, CardContent } from "@/src/components/ui/card"
-import { Code2, Key, BarChart2, Play, ArrowRight, Sparkles, Bot, Check } from "lucide-react"
+import { Code2, Key, BarChart2, Play, ArrowRight, Sparkles, Bot, Check, GitFork, MessageSquare } from "lucide-react"
 import { BackgroundGradients } from "@/src/components/background-gradients"
 
 const SAMPLE_RESPONSE = `{
-  "data": [
-    {
-      "orderHash": "0x04f7a1...",
-      "offerer": "0x0591...",
-      "nftContract": "0x05e7...",
-      "tokenId": "42",
-      "price": "500000",
-      "currency": "USDC",
-      "status": "OPEN"
-    }
-  ],
-  "meta": { "total": 128, "page": 1, "limit": 20 }
+  "data": {
+    "tokenId": "42",
+    "name": "Sonic Bloom #42",
+    "description": "Generative audio-visual IP on Starknet.",
+    "image": "ipfs://bafybe.../42.png",
+    "ipType": "Audio",
+    "licenseType": "CC BY",
+    "attributes": [
+      { "trait_type": "IP Type",      "value": "Audio" },
+      { "trait_type": "License Type", "value": "CC BY" },
+      { "trait_type": "BPM",          "value": "128" },
+      { "trait_type": "Creator",      "value": "0x05f9..." }
+    ],
+    "remixCount": 3,
+    "commentCount": 11
+  }
 }`
 
 export default function Home() {
@@ -62,6 +66,8 @@ export default function Home() {
               { icon: Code2, label: "Orders & Listings" },
               { icon: BarChart2, label: "Collections & Stats" },
               { icon: Key, label: "IP Metadata" },
+              { icon: GitFork, label: "Remix Licensing" },
+              { icon: MessageSquare, label: "On-chain Comments" },
               { icon: Bot, label: "AI Agent Ready" },
             ].map(({ icon: Icon, label }) => (
               <div
@@ -81,7 +87,7 @@ export default function Home() {
                 <span className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
                 <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
                 <span className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
-                <span className="ml-2 text-xs text-muted-foreground font-mono">GET /v1/orders</span>
+                <span className="ml-2 text-xs text-muted-foreground font-mono">GET /v1/tokens/:contract/:tokenId</span>
               </div>
               <pre className="p-4 text-xs font-mono text-green-300/90 overflow-x-auto leading-relaxed">
                 {SAMPLE_RESPONSE}
