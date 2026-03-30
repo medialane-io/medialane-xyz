@@ -1,47 +1,14 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { provisionUser } from "@/src/lib/portal/provision";
-import { AccountDashboard } from "./dashboard";
+import Link from "next/link"
+import { Button } from "@/src/components/ui/button"
 
-export default async function AccountPage() {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
-
-  const clerk = await clerkClient();
-  let user = await clerk.users.getUser(userId);
-
-  if (!user.privateMetadata?.backendApiKey) {
-    await provisionUser(userId);
-    // Re-fetch after provision so we have the key for the plan lookup
-    user = await clerk.users.getUser(userId);
-  }
-
-  let plan = "FREE";
-  const apiKey = user.privateMetadata?.backendApiKey as string | undefined;
-  if (apiKey) {
-    try {
-      const apiUrl = process.env.MEDIALANE_API_URL || "http://localhost:3000";
-      const res = await fetch(`${apiUrl}/v1/portal/me`, {
-        headers: { "x-api-key": apiKey },
-        next: { revalidate: 60 },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        plan = data?.data?.plan ?? "FREE";
-      }
-    } catch {
-      // non-fatal — show FREE as fallback
-    }
-  }
-
+export default function AccountPage() {
   return (
-    <AccountDashboard
-      initialPlan={plan}
-      userImageUrl={user.imageUrl}
-      userFullName={user.fullName}
-      userEmail={user.primaryEmailAddress?.emailAddress ?? ""}
-      userId={userId}
-      publicKey={user.publicMetadata?.publicKey as string | undefined}
-    />
-  );
+    <div className="container mx-auto px-4 pt-32 pb-16 max-w-lg text-center space-y-6">
+      <h1 className="text-3xl font-bold text-white">Account</h1>
+      <p className="text-muted-foreground">Account dashboard is temporarily unavailable. Contact us to get API access.</p>
+      <Button asChild>
+        <Link href="/connect">Contact Us</Link>
+      </Button>
+    </div>
+  )
 }
