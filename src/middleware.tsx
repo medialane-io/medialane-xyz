@@ -30,43 +30,9 @@ function hasWalletClaim(sessionClaims: Record<string, unknown> | null): boolean 
   return metadata?.walletCreated === true;
 }
 
-export default clerkMiddleware(async (auth, req) => {
-  const { userId, sessionClaims, redirectToSignIn } = await auth();
-
-  // Unauthenticated user hitting a private route → sign-in
-  if (!userId && !isPublicRoute(req)) {
-    return redirectToSignIn({ returnBackUrl: req.url });
-  }
-
-  if (userId) {
-    let hasWallet = hasWalletClaim(sessionClaims);
-
-    // Fallback: if JWT claims don't show walletCreated (e.g. session token template
-    // not configured in Clerk dashboard, or token is stale after onboarding),
-    // check directly via the Clerk API. Only runs on routes where we'd redirect
-    // to onboarding — skipped for public and portal paths to avoid unnecessary calls.
-    if (!hasWallet && !isPublicRoute(req) && !isPortalPath(req)) {
-      try {
-        const client = await clerkClient();
-        const clerkUser = await client.users.getUser(userId);
-        hasWallet = clerkUser.publicMetadata?.walletCreated === true;
-      } catch {
-        // If the API check fails, fall through — treat as no wallet
-      }
-    }
-
-    // Already has a wallet and hits /onboarding → send home
-    if (hasWallet && req.nextUrl.pathname === "/onboarding") {
-      return NextResponse.redirect(new URL("/", req.url));
-    }
-
-    // No wallet yet → enforce onboarding, except for portal & public routes
-    if (!hasWallet && !isPublicRoute(req) && !isPortalPath(req) && req.nextUrl.pathname !== "/onboarding") {
-      const onboardingUrl = new URL("/onboarding", req.url);
-      onboardingUrl.searchParams.set("redirect_url", req.url);
-      return NextResponse.redirect(onboardingUrl);
-    }
-  }
+export default clerkMiddleware(async (_auth, _req) => {
+  // All routes are public — no forced sign-in or onboarding redirects.
+  // Auth is opt-in: pages that need it call auth() directly.
 });
 
 export const config = {
