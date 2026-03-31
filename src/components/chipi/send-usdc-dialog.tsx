@@ -22,7 +22,7 @@ import {
     FormMessage,
 } from "@/src/components/ui/form";
 import { Input } from "@/src/components/ui/input";
-import { useAuth } from "@clerk/nextjs";
+import { authClient } from "@/src/lib/auth-client";
 import { useTransfer, useGetWallet, ChainToken } from "@chipi-stack/nextjs";
 import { useState } from "react";
 import { WalletPinDialog } from "./wallet-pin-dialog";
@@ -40,14 +40,14 @@ const FormSchema = z.object({
 type FormValues = z.infer<typeof FormSchema>;
 
 export function SendUsdcDialog() {
-    const { getToken, userId: clerkUserId } = useAuth();
+    const { data: session } = authClient.useSession();
     const [pinOpen, setPinOpen] = useState(false);
     const [formData, setFormData] = useState<FormValues | null>(null);
 
     const { data: wallet } = useGetWallet({
-        getBearerToken: () => getToken({ template: "chipipay" }).then(t => t || ""),
+        getBearerToken: () => authClient.token().then(t => t?.token ?? ""),
         params: {
-            externalUserId: clerkUserId || "",
+            externalUserId: session?.user?.id ?? "",
         },
     });
 
@@ -74,7 +74,7 @@ export function SendUsdcDialog() {
             return;
         }
 
-        const token = await getToken({ template: "chipipay" });
+        const token = await authClient.token().then(t => t?.token ?? null);
         if (!token) {
             toast.error("Authentication failed");
             return;

@@ -7,16 +7,15 @@ import { Input } from "@/src/components/ui/input";
 import { Badge } from "@/src/components/ui/badge";
 import { Loader2, Search, Zap, Info, AlertCircle, CheckCircle2, Copy, ExternalLink, Bug } from "lucide-react";
 import { useCallAnyContract } from "@chipi-stack/nextjs";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { authClient } from "@/src/lib/auth-client";
 import { CallData, byteArray, RpcProvider } from "starknet";
 import { CONTRACTS, provider as defaultProvider } from "@/src/services/constant";
 import { toast } from "@/src/hooks/use-toast";
 
 export default function ChipiDebugger() {
-    const { user } = useUser();
-    const { getToken } = useAuth();
-    const publicKey = user?.publicMetadata?.publicKey as string;
-    const encryptedPrivateKey = user?.publicMetadata?.encryptedPrivateKey as string;
+    const { data: session } = authClient.useSession();
+    const publicKey = (session?.user as any)?.walletPublicKey as string ?? "";
+    const encryptedPrivateKey = "";
     const { callAnyContractAsync, isLoading: isCalling } = useCallAnyContract();
 
     // State for debugging
@@ -72,7 +71,7 @@ export default function ChipiDebugger() {
     };
 
     const handleTestCreate = async () => {
-        if (!user || !publicKey) {
+        if (!session?.user || !publicKey) {
             toast({ title: "Login required", variant: "destructive" });
             return;
         }
@@ -80,7 +79,7 @@ export default function ChipiDebugger() {
         addLog("Starting Test Collection Creation...");
 
         try {
-            const token = await getToken({ template: process.env.NEXT_PUBLIC_CLERK_TEMPLATE_NAME });
+            const token = await authClient.token().then(t => t?.token ?? null);
             if (!token) throw new Error("No token");
 
             const assetName = "DEBUG_" + Date.now();

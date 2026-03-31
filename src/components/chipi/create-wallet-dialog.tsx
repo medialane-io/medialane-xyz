@@ -29,7 +29,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/src/components/ui/alert";
 import { CheckCircleIcon } from "lucide-react";
 import { useCreateWallet, Chain } from "@chipi-stack/nextjs";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { authClient } from "@/src/lib/auth-client";
 
 const FormSchema = z
     .object({
@@ -46,8 +46,7 @@ const FormSchema = z
     });
 
 export function CreateWalletDialog({ open, onOpenChange, trigger }: { open?: boolean; onOpenChange?: (open: boolean) => void; trigger?: React.ReactNode }) {
-    const { getToken, userId: clerkUserId } = useAuth();
-    const { user } = useUser();
+    const { data: session } = authClient.useSession();
     const {
         createWalletAsync,
         isLoading,
@@ -64,8 +63,8 @@ export function CreateWalletDialog({ open, onOpenChange, trigger }: { open?: boo
     });
 
     const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-        const token = await getToken({ template: "chipipay" });
-        if (!token || !clerkUserId) {
+        const token = await authClient.token().then(t => t?.token ?? null);
+        if (!token || !session?.user?.id) {
             toast.error("Authentication failed");
             return;
         }
@@ -74,7 +73,7 @@ export function CreateWalletDialog({ open, onOpenChange, trigger }: { open?: boo
             await createWalletAsync({
                 params: {
                     encryptKey: data.pin,
-                    externalUserId: clerkUserId,
+                    externalUserId: session.user.id,
                     chain: "STARKNET" as Chain,
                 },
                 bearerToken: token,

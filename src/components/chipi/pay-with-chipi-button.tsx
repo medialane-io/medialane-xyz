@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { Button } from "@/src/components/ui/button";
 import { toast } from "sonner";
 
-import { useAuth } from "@clerk/nextjs";
+import { authClient } from "@/src/lib/auth-client";
 import {
     useRecordSendTransaction,
     useTransfer,
@@ -15,7 +15,6 @@ import {
 import { WalletPinDialog } from "./wallet-pin-dialog";
 
 export function PayWithChipiButton({ usdAmount, recipientAddress }: { usdAmount: number; recipientAddress: string }) {
-    const { getToken } = useAuth();
     const [pinOpen, setPinOpen] = useState(false);
 
     // We need wallet data for the transfer
@@ -29,7 +28,7 @@ export function PayWithChipiButton({ usdAmount, recipientAddress }: { usdAmount:
         setPinOpen(false);
 
         try {
-            const token = await getToken({ template: "chipipay" });
+            const token = await authClient.token().then(t => t?.token ?? null);
             if (!token) {
                 toast.error("Authentication failed");
                 return;

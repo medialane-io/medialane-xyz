@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback, useRef } from "react"
-import { useAuth, useUser } from "@clerk/nextjs"
+import { authClient } from "@/src/lib/auth-client"
 import { useCallAnyContract } from "@chipi-stack/nextjs"
 import { provider } from "@/src/services/constant"
 
@@ -57,8 +57,6 @@ function chipiError(...args: any[]) {
 // ─── Hook ─────────────────────────────────────────────────────────────────
 
 export function useChipiTransaction() {
-    const { getToken } = useAuth()
-    const { user } = useUser()
     const { callAnyContractAsync } = useCallAnyContract()
 
     const [status, setStatus] = useState<ChipiTransactionStatus>("idle")
@@ -69,23 +67,17 @@ export function useChipiTransaction() {
     const isSubmittingRef = useRef(false)
 
     /**
-     * Get wallet credentials from Clerk user metadata.
-     * Can be overridden by passing wallet directly in params.
+     * Get wallet credentials from override params.
+     * Wallet must be passed explicitly via params.wallet.
      */
     const getWallet = useCallback(
         (override?: ChipiTransactionParams["wallet"]) => {
-            if (override) return override
-
-            const publicKey = user?.publicMetadata?.publicKey as string | undefined
-            const encryptedPrivateKey = user?.publicMetadata?.encryptedPrivateKey as string | undefined
-
-            if (!publicKey || !encryptedPrivateKey) {
+            if (!override) {
                 throw new Error("Wallet data not available. Please ensure your account is set up.")
             }
-
-            return { publicKey, encryptedPrivateKey }
+            return override
         },
-        [user]
+        []
     )
 
     /**
@@ -108,9 +100,8 @@ export function useChipiTransaction() {
 
             try {
                 // 1. Get bearer token
-                const token = await getToken({
-                    template: process.env.NEXT_PUBLIC_CLERK_TEMPLATE_NAME,
-                })
+                const tokenResult = await authClient.token()
+                const token = tokenResult?.token ?? null
 
                 if (!token) {
                     throw new Error("No bearer token found. Please try to login again.")
@@ -204,7 +195,7 @@ export function useChipiTransaction() {
                 isSubmittingRef.current = false
             }
         },
-        [getToken, getWallet, callAnyContractAsync]
+        [getWallet, callAnyContractAsync]
     )
 
     /** Reset state back to idle */

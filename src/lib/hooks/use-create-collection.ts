@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useAccount, useSendTransaction, useTransactionReceipt } from "@starknet-react/core"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@clerk/nextjs"
+import { authClient } from "@/src/lib/auth-client"
 import { useGetWallet } from "@chipi-stack/nextjs"
 import { useChipiTransaction } from "@/src/lib/hooks/use-chipi-transaction"
 import { useToast } from "@/src/components/ui/use-toast"
@@ -41,10 +41,10 @@ export function useCreateCollection() {
     const [txHash, setTxHash] = useState<string | undefined>(undefined)
 
     // Chipipay hooks
-    const { getToken, userId: clerkUserId } = useAuth()
+    const { data: session } = authClient.useSession()
     const { data: customerWallet } = useGetWallet({
-        getBearerToken: () => getToken({ template: "chipipay" }).then(t => t || ""),
-        params: { externalUserId: clerkUserId || "" },
+        getBearerToken: () => authClient.token().then(t => t?.token ?? ""),
+        params: { externalUserId: session?.user?.id ?? "" },
     })
     const { executeTransaction } = useChipiTransaction()
 

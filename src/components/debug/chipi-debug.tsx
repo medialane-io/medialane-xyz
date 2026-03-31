@@ -1,20 +1,20 @@
 "use client";
 
-import { useAuth, useUser } from "@clerk/nextjs";
+import { authClient } from "@/src/lib/auth-client";
 import { useGetWallet } from "@chipi-stack/nextjs";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
 
 export function ChipiDebug() {
-    const { isLoaded, userId, getToken } = useAuth();
-    const { user } = useUser();
+    const { data: session } = authClient.useSession();
+    const userId = session?.user?.id;
     const [token, setToken] = useState<string | null>(null);
     const [apiKey, setApiKey] = useState<string | null>(null);
 
     const { data: wallet, error, isLoading, refetch } = useGetWallet({
-        getBearerToken: () => getToken({ template: "chipipay" }).then(t => t || ""),
-        params: { externalUserId: userId || "" },
+        getBearerToken: () => authClient.token().then(t => t?.token ?? ""),
+        params: { externalUserId: userId ?? "" },
         queryOptions: {
             enabled: !!userId,
             retry: false,
@@ -26,22 +26,20 @@ export function ChipiDebug() {
     useEffect(() => {
         const fetchToken = async () => {
             if (userId) {
-                const t = await getToken();
-                setToken(t);
                 try {
-                    const ct = await getToken({ template: "chipipay" });
-                    setChipiToken(ct);
+                    const result = await authClient.token();
+                    setToken(result?.token ?? null);
+                    setChipiToken(result?.token ?? null);
                 } catch (e) {
-                    console.error("Failed to get chipi token", e);
+                    console.error("Failed to get token", e);
                 }
             }
         };
         fetchToken();
-        // Check for public key in env (client-side safe only if NEXT_PUBLIC)
         setApiKey(process.env.NEXT_PUBLIC_CHIPI_API_KEY || "NOT SET");
-    }, [userId, getToken]);
+    }, [userId]);
 
-    if (!isLoaded) return <div>Loading Auth...</div>;
+    if (session === undefined) return <div>Loading Auth...</div>;
 
     return (
         <Card className="w-full max-w-2xl mx-auto my-8 border-red-500 border-2">
@@ -57,7 +55,7 @@ export function ChipiDebug() {
                 <div>
                     <h3 className="font-bold">Clerk Auth</h3>
                     <p>User ID: {userId || "Not Logged In"}</p>
-                    <p>Email: {user?.primaryEmailAddress?.emailAddress}</p>
+                    <p>Email: {session?.user?.email}</p>
                     <p>Token: {token ? (token.substring(0, 10) + "...") : "No Token"}</p>
                     <p>Chipi Token: {chipiToken ? (chipiToken.substring(0, 10) + "...") : <span className="text-red-500 font-bold">MISSING (Check Clerk Template)</span>}</p>
                 </div>

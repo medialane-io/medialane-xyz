@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/src/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { authClient } from "@/src/lib/auth-client";
 import { useChipiTransaction } from "@/src/lib/hooks/use-chipi-transaction";
 import { FormWrapper } from "../ui/forms/wrapper";
 import { TextAreaInput, TextInput } from "../ui/forms/input";
@@ -97,8 +97,9 @@ const validationSchema = Yup.object().shape({
 export default function CreateAssetView() {
   const router = useRouter();
   const uploaderRef = useRef<MediaUploaderRef>(null);
-  const { user } = useUser();
-  const publicKey = user?.publicMetadata?.publicKey as string;
+  const { data: session } = authClient.useSession();
+  const user = session?.user ?? null;
+  const publicKey = (session?.user as any)?.walletPublicKey as string ?? "";
   const { executeTransaction, isSubmitting: isMinting, statusMessage } = useChipiTransaction();
   const { uploadToIpfs, loading } = useIpfsUpload();
   // Upload and media state

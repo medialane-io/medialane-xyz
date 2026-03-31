@@ -24,7 +24,7 @@ import {
     ExternalLink,
 } from "lucide-react";
 import { toast } from "@/src/hooks/use-toast";
-import { useUser } from "@clerk/nextjs";
+import { authClient } from "@/src/lib/auth-client";
 import { useChipiTransaction } from "@/src/lib/hooks/use-chipi-transaction";
 import { CONTRACTS } from "@/src/services/constant";
 import { useIpfsUpload } from "@/src/hooks/useIpfs";
@@ -85,8 +85,9 @@ interface MintEventAssetProps {
 }
 
 export default function MintEventAsset({ asset, contractAddress }: MintEventAssetProps) {
-    const { user } = useUser();
-    const publicKey = user?.publicMetadata?.publicKey as string;
+    const { data: session } = authClient.useSession();
+    const user = session?.user ?? null;
+    const publicKey = (session?.user as any)?.walletPublicKey as string ?? "";
     const { executeTransaction, isSubmitting: isMinting, statusMessage } = useChipiTransaction();
     const { uploadToIpfs, loading } = useIpfsUpload();
 
