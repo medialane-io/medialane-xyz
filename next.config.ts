@@ -26,10 +26,6 @@ const nextConfig: NextConfig = {
         hostname: 'cloudflare-ipfs.com',
         pathname: '/ipfs/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'witty-filly-25.accounts.dev', // Clerk avatars
-      }
     ],
   },
   webpack: (config, { isServer }) => {
