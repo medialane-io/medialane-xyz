@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/src/lib/auth";
+import { pool } from "@/src/lib/db";
 import { headers } from "next/headers";
 
 interface WalletData {
@@ -16,13 +17,10 @@ export const completeOnboarding = async (walletData: WalletData) => {
       return { error: "No Logged In User" };
     }
 
-    await auth.api.updateUser({
-      headers: await headers(),
-      body: {
-        walletPublicKey: walletData.publicKey,
-        walletEncryptedPrivateKey: walletData.encryptedPrivateKey,
-      } as Record<string, unknown>,
-    });
+    await pool.query(
+      'UPDATE "user" SET "walletPublicKey" = $1, "walletEncryptedPrivateKey" = $2 WHERE id = $3',
+      [walletData.publicKey, walletData.encryptedPrivateKey, session.user.id]
+    );
 
     return { success: true };
   } catch (err) {
@@ -42,16 +40,21 @@ export const getWalletData = async (): Promise<{
 
     if (!session) return null;
 
-    const user = session.user as typeof session.user & {
-      walletPublicKey?: string | null;
-      walletEncryptedPrivateKey?: string | null;
-    };
+    const row = await pool.query<{
+      walletPublicKey: string | null;
+      walletEncryptedPrivateKey: string | null;
+    }>(
+      'SELECT "walletPublicKey", "walletEncryptedPrivateKey" FROM "user" WHERE id = $1',
+      [session.user.id]
+    );
 
-    if (!user.walletPublicKey || !user.walletEncryptedPrivateKey) return null;
+    const { walletPublicKey, walletEncryptedPrivateKey } = row.rows[0] ?? {};
+
+    if (!walletPublicKey || !walletEncryptedPrivateKey) return null;
 
     return {
-      publicKey: user.walletPublicKey,
-      encryptedPrivateKey: user.walletEncryptedPrivateKey,
+      publicKey: walletPublicKey,
+      encryptedPrivateKey: walletEncryptedPrivateKey,
     };
   } catch (err) {
     console.error("Error fetching wallet data:", err);

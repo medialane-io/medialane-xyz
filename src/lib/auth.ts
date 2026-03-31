@@ -36,6 +36,7 @@ export const auth = betterAuth({
         type: "string",
         nullable: true,
         input: false,
+        returned: false,
       },
       backendApiKey: {
         type: "string",
