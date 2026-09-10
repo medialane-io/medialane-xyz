@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAccount } from "@starknet-react/core";
-import { ServiceFormShell, ClaimRail, MedialaneCollectionCard } from "@medialane/ui";
+import { ServiceFormShell, ClaimRail, MedialaneCollectionCard, CollapsibleSection } from "@medialane/ui";
 import { buildAssetMetadata } from "@medialane/sdk";
 import {
   ArrowLeft,
@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Upload,
   Users,
+  Layers,
 } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -45,6 +46,7 @@ import {
   AI_POLICIES,
   TERRITORIES,
   IP_TYPES,
+  termsSummary,
   type IssuanceValues,
 } from "@/src/lib/issuance-form";
 
@@ -65,6 +67,8 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
   const [error, setError] = useState<string | null>(null);
   const [issued, setIssued] = useState<number | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [termsOpen, setTermsOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const set = <K extends keyof IssuanceValues>(key: K, value: IssuanceValues[K]) =>
     setValues((v) => ({ ...v, [key]: value }));
@@ -290,6 +294,18 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
             />
           </Field>
 
+        </section>
+
+        <CollapsibleSection
+          open={detailsOpen}
+          onOpenChange={setDetailsOpen}
+          icon={<Layers className="h-4 w-4 text-primary" />}
+          label="Type & details"
+          hint="Optional"
+        >
+          <p className="text-xs text-muted-foreground">
+            Say what kind of material this is, and link to somewhere it can be read about.
+          </p>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Type" error={fieldErrors.ipType}>
               <Choice
@@ -308,15 +324,18 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
               />
             </Field>
           </div>
-        </section>
+        </CollapsibleSection>
 
-        <section className="space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold">Terms</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              These travel with the asset and are recorded alongside it.
-            </p>
-          </div>
+        <CollapsibleSection
+          open={termsOpen}
+          onOpenChange={setTermsOpen}
+          icon={<ShieldCheck className="h-4 w-4 text-primary" />}
+          label="Licensing terms"
+          hint={termsSummary(values)}
+        >
+          <p className="text-xs text-muted-foreground">
+            These travel with the asset and are recorded alongside it as proof of the terms you set.
+          </p>
 
           <Field label="AI and data mining" error={fieldErrors.aiPolicy}>
             <Choice
@@ -379,7 +398,7 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
               />
             </Field>
           </div>
-        </section>
+        </CollapsibleSection>
 
         <section className="space-y-4">
           <div>

@@ -5,6 +5,7 @@ import {
   imageRejectionReason,
   LICENSE_PRESETS,
   AI_POLICIES,
+  termsSummary,
 } from "./issuance-form";
 
 function valid(overrides: Record<string, unknown> = {}) {
@@ -69,4 +70,14 @@ test("a non-image is rejected", () => {
 test("a normal image is accepted", () => {
   const png = new File([new Uint8Array(1024)], "a.png", { type: "image/png" });
   expect(imageRejectionReason(png)).toBeNull();
+});
+
+test("the panel summary shows the licence and the AI stance", () => {
+  expect(termsSummary({ licenseType: "All Rights Reserved", aiPolicy: "Not Allowed" }))
+    .toBe("All Rights Reserved · No AI use");
+});
+
+test("granting AI use reads as granted", () => {
+  expect(termsSummary({ licenseType: "CC BY", aiPolicy: "Training Only" }))
+    .toBe("CC BY · AI training only");
 });

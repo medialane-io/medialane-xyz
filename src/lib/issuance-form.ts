@@ -80,3 +80,8 @@ export function imageRejectionReason(file: File): string | null {
   }
   return null;
 }
+
+export function termsSummary(values: Pick<IssuanceValues, "licenseType" | "aiPolicy">): string {
+  const ai = values.aiPolicy === "Not Allowed" ? "No AI use" : `AI ${values.aiPolicy.toLowerCase()}`;
+  return `${values.licenseType} · ${ai}`;
+}

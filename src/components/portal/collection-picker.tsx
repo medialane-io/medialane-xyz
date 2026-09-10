@@ -3,16 +3,30 @@
 import { useState } from "react";
 import useSWR from "swr";
 import { useAccount } from "@starknet-react/core";
-import { Loader2, Plus } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@medialane/ui";
+import { ChevronDown, Check, ImageIcon, Loader2, Plus } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
+import { Skeleton } from "@/src/components/ui/skeleton";
 import { portalFetcher } from "@/src/lib/portal/fetcher";
 
 export interface CollectionOption {
   collectionId: string | null;
   contractAddress: string;
   name: string | null;
+  image?: string | null;
+  totalSupply?: number | null;
+}
+
+export function collectionLabel(c: CollectionOption): string {
+  return c.name?.trim() || `Collection ${c.collectionId}`;
+}
+
+export function collectionWorks(c: CollectionOption): string {
+  const n = c.totalSupply ?? 0;
+  if (n === 0) return "No works yet";
+  return `${n} ${n === 1 ? "work" : "works"}`;
 }
 
 export function CollectionPicker({
@@ -29,11 +43,13 @@ export function CollectionPicker({
   disabled?: boolean;
 }) {
   const { account } = useAccount();
-  const { data, isLoading, mutate } = useSWR<{ collections?: CollectionOption[]; data?: CollectionOption[] }>(
-    `/api/portal/collections?service=${serviceId}`,
-    portalFetcher,
-  );
+  const { data, isLoading, mutate } = useSWR<{
+    collections?: CollectionOption[];
+    data?: CollectionOption[];
+  }>(`/api/portal/collections?service=${serviceId}`, portalFetcher);
 
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const [creating, setCreating] = useState(false);
   const [busy, setBusy] = useState(false);
   const [name, setName] = useState("");
@@ -41,6 +57,11 @@ export function CollectionPicker({
   const [error, setError] = useState<string | null>(null);
 
   const collections = (data?.collections ?? data?.data ?? []).filter((c) => c.collectionId);
+  const selected = collections.find((c) => c.collectionId === value) ?? null;
+
+  const filtered = query.trim()
+    ? collections.filter((c) => collectionLabel(c).toLowerCase().includes(query.trim().toLowerCase()))
+    : collections;
 
   async function create() {
     if (!account) return;
@@ -65,7 +86,7 @@ export function CollectionPicker({
       const tx = await account.execute(body.data.calls);
       await account.waitForTransaction(tx.transaction_hash);
 
-      const created = await waitForCollection(serviceId, collections.length, mutate);
+      const created = await waitForCollection(collections.length, mutate);
       if (created?.collectionId) onChange(created.collectionId);
 
       setCreating(false);
@@ -78,29 +99,74 @@ export function CollectionPicker({
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        <Label>Collection *</Label>
+        <Skeleton className="h-[4.25rem] rounded-xl" />
+      </div>
+    );
+  }
+
   if (creating) {
     return (
-      <div className="space-y-3 rounded-xl border border-border/60 p-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="col-name">Collection name</Label>
-            <Input id="col-name" value={name} onChange={(e) => setName(e.target.value)} disabled={busy} />
+      <div className="space-y-2">
+        <Label>New collection</Label>
+        <div className="space-y-3 rounded-xl border border-border p-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="col-name">Name</Label>
+              <Input
+                id="col-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Research archive"
+                disabled={busy}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="col-symbol">Symbol</Label>
+              <Input
+                id="col-symbol"
+                value={symbol}
+                onChange={(e) => setSymbol(e.target.value)}
+                placeholder="ARCH"
+                disabled={busy}
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="col-symbol">Symbol</Label>
-            <Input id="col-symbol" value={symbol} onChange={(e) => setSymbol(e.target.value)} disabled={busy} />
+
+          <p className="text-xs text-muted-foreground">
+            You own this collection, and you are the only one who can issue into it.
+          </p>
+
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+
+          <div className="flex gap-2">
+            <Button onClick={create} disabled={busy || !name.trim() || !symbol.trim()} size="sm">
+              {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {busy ? "Creating" : "Create"}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setCreating(false)} disabled={busy}>
+              Cancel
+            </Button>
           </div>
         </div>
+      </div>
+    );
+  }
 
-        {error ? <p className="text-sm text-destructive">{error}</p> : null}
-
-        <div className="flex gap-2">
-          <Button onClick={create} disabled={busy || !name.trim() || !symbol.trim()} size="sm">
-            {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            {busy ? "Creating" : "Create"}
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => setCreating(false)} disabled={busy}>
-            Cancel
+  if (collections.length === 0) {
+    return (
+      <div className="space-y-2">
+        <Label>Collection *</Label>
+        <div className="rounded-xl border border-dashed border-border p-6 text-center space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Everything you tokenize lives in a collection you own.
+          </p>
+          <Button size="sm" onClick={() => setCreating(true)} disabled={disabled}>
+            <Plus className="mr-1.5 h-3.5 w-3.5" />
+            Create your first collection
           </Button>
         </div>
       </div>
@@ -109,45 +175,116 @@ export function CollectionPicker({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="collection">Collection</Label>
-      {isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading your collections…</p>
-      ) : (
-        <div className="flex gap-2">
-          <select
-            id="collection"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            disabled={disabled || collections.length === 0}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:opacity-50"
-          >
-            <option value="">
-              {collections.length === 0 ? "No collections yet" : "Choose a collection"}
-            </option>
-            {collections.map((c) => (
-              <option key={c.collectionId!} value={c.collectionId!}>
-                {c.name ?? `Collection ${c.collectionId}`}
-              </option>
-            ))}
-          </select>
-          <Button variant="outline" size="sm" onClick={() => setCreating(true)} disabled={disabled}>
-            <Plus className="mr-1.5 h-4 w-4" />
-            New
-          </Button>
-        </div>
-      )}
+      <Label>Collection *</Label>
+      <div className="flex gap-2">
+        <Popover
+          open={open}
+          onOpenChange={(next) => {
+            setOpen(next);
+            if (!next) setQuery("");
+          }}
+        >
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              aria-expanded={open}
+              disabled={disabled}
+              className="flex flex-1 items-center gap-3 rounded-xl border border-border p-3 text-left transition-colors hover:bg-muted/40 disabled:opacity-50"
+            >
+              <Thumb image={selected?.image} />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold truncate">
+                  {selected ? collectionLabel(selected) : "Choose a collection"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {selected ? collectionWorks(selected) : "Where this will live"}
+                </p>
+              </div>
+              <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground shrink-0">
+                Change
+                <ChevronDown className="h-3.5 w-3.5" />
+              </span>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+            {collections.length > 5 ? (
+              <div className="border-b border-border p-2">
+                <Input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search collections…"
+                  className="h-8"
+                />
+              </div>
+            ) : null}
+            <div className="max-h-64 overflow-y-auto p-1">
+              {filtered.length === 0 ? (
+                <p className="px-3 py-4 text-center text-sm text-muted-foreground">
+                  No collection found.
+                </p>
+              ) : (
+                filtered.map((col) => (
+                  <button
+                    key={col.collectionId!}
+                    type="button"
+                    onClick={() => {
+                      onChange(col.collectionId!);
+                      setOpen(false);
+                    }}
+                    className="flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-muted/60"
+                  >
+                    <Thumb image={col.image} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium truncate">{collectionLabel(col)}</p>
+                      <p className="text-xs text-muted-foreground">{collectionWorks(col)}</p>
+                    </div>
+                    {value === col.collectionId ? (
+                      <Check className="h-4 w-4 shrink-0 text-primary" />
+                    ) : null}
+                  </button>
+                ))
+              )}
+            </div>
+            <div className="border-t border-border p-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setCreating(true);
+                }}
+                className="flex w-full items-center gap-2 rounded-lg p-2 text-left text-sm font-medium transition-colors hover:bg-muted/60"
+              >
+                <Plus className="h-4 w-4" />
+                New collection
+              </button>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
     </div>
   );
 }
 
+function Thumb({ image }: { image?: string | null }) {
+  if (!image) {
+    return (
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-muted">
+        <ImageIcon className="h-4 w-4 text-muted-foreground" />
+      </div>
+    );
+  }
+  return <img src={image} alt="" className="h-11 w-11 shrink-0 rounded-lg object-cover" />;
+}
+
 async function waitForCollection(
-  serviceId: string,
   previousCount: number,
   mutate: () => Promise<unknown>,
 ): Promise<CollectionOption | null> {
   for (let attempt = 0; attempt < 20; attempt++) {
     await new Promise((r) => setTimeout(r, 3000));
-    const refreshed = (await mutate()) as { collections?: CollectionOption[]; data?: CollectionOption[] } | undefined;
+    const refreshed = (await mutate()) as
+      | { collections?: CollectionOption[]; data?: CollectionOption[] }
+      | undefined;
     const rows = (refreshed?.collections ?? refreshed?.data ?? []).filter((c) => c.collectionId);
     if (rows.length > previousCount) return rows[rows.length - 1];
   }
