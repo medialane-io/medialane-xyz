@@ -29,7 +29,17 @@ export function invalidRecipients(recipients: Recipient[]): Recipient[] {
   return recipients.filter((r) => r.scheme === "email" && !isValidEmail(r.value));
 }
 
-export function interimKeyFor(secret: Uint8Array, recipient: Recipient) {
-  const { privateKey, publicKey } = deriveOwnerKeyPair(secret, `${recipient.scheme}:${recipient.value}`);
+export function newDerivationSalt(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+export function interimKeyFor(secret: Uint8Array, recipient: Recipient, salt: string) {
+  if (salt.length < 16) throw new Error("derivation salt is too short");
+  const { privateKey, publicKey } = deriveOwnerKeyPair(
+    secret,
+    `${recipient.scheme}:${recipient.value}:${salt}`,
+  );
   return { privateKey, publicKey, walletAddress: computeAccountAddress(publicKey, 0) };
 }
