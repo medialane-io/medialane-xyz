@@ -3,53 +3,46 @@ import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
-import { Ticket, ShieldCheck, Repeat, Mail, ArrowLeft } from "lucide-react"
+import { GraduationCap, ShieldCheck, Mail, ArrowLeft } from "lucide-react"
 import { pageMetadata } from "@/src/lib/seo"
 
 export const metadata: Metadata = pageMetadata({
-  title: "Tickets",
-  description: "Verifiable, resellable admission tickets for festivals and event brands, issued at scale with their own supply and validity window, checkable at the door.",
-  path: "/enterprise/tickets",
+  title: "Tokenization for Enterprise",
+  description: "Digital passes and credentials for schools and organizations that can't be faked or copied, with payouts handled on your behalf.",
+  path: "/services/tokenize",
 })
 
 const ITEMS: FeatureRowItem[] = [
   {
-    icon: Ticket,
-    eyebrow: "Festivals & event brands",
-    color: "bg-brand-rose",
-    title: "Tickets that show up ready to use",
-    description: "Every ticket has its own supply and validity window, and is verifiable at the door, ahead of time.",
-  },
-  {
-    icon: Repeat,
-    eyebrow: "Resale",
+    icon: GraduationCap,
+    eyebrow: "Schools & organizations",
     color: "bg-brand-blue",
-    title: "Resold safely if plans change",
-    description: "A ticket can be set to trade freely or stay with its original holder. You choose the policy per event.",
+    title: "Digital passes",
+    description: "Give members, students, or attendees a pass that can't be faked or copied. Nothing for them to download or set up.",
   },
   {
     icon: ShieldCheck,
-    eyebrow: "At the door",
-    color: "bg-brand-orange",
-    title: "Verifiable, no app required for you to build",
-    description: "Attendance checks against the chain directly. There's no separate database that can fall out of sync with what was actually sold.",
+    eyebrow: "Publishers & rights holders",
+    color: "bg-brand-maeve",
+    title: "Payouts, handled",
+    description: "We pay your creators or partners on your behalf. You keep the relationship, we handle the paperwork.",
   },
 ]
 
-export default function TicketsPage() {
+export default function TokenizeEnterprisePage() {
   return (
     <div className="relative w-full overflow-hidden">
       <div className="relative z-10">
         <section className="container mx-auto px-4 pt-28 pb-16 max-w-3xl text-center space-y-5">
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
-            Tickets
+            Tokenization for Enterprise
           </Badge>
           <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-            Tickets your audience can hold and trust
+            Credentials people can trust
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Built on IP Tickets, live on Medialane today. No app to install, no separate account
-            to create.
+            Every credential is tamper-proof and owned directly by the person holding it.
+            Nothing for your organization to store, and nothing for them to lose.
           </p>
         </section>
 
@@ -59,7 +52,7 @@ export default function TicketsPage() {
 
         <section className="container mx-auto px-4 pb-24 max-w-2xl text-center space-y-4">
           <Button asChild variant="ghost" size="sm">
-            <Link href="/enterprise"><ArrowLeft className="w-4 h-4 mr-1.5" />All Enterprise services</Link>
+            <Link href="/services"><ArrowLeft className="w-4 h-4 mr-1.5" />All services</Link>
           </Button>
           <div>
             <Button asChild variant="gradient-fill" className="from-brand-blue to-brand-maeve" size="lg">

@@ -75,7 +75,7 @@ export default function AgentsPage() {
               <Link href="/developers">View developer docs</Link>
             </Button>
             <Button asChild variant="gradient-border" className="pair-rose-orange" size="lg">
-              <Link href="/enterprise/ai-data">See the rights-holder side<ArrowRight className="w-4 h-4 ml-2" /></Link>
+              <Link href="/services/ai-data">See the rights-holder side<ArrowRight className="w-4 h-4 ml-2" /></Link>
             </Button>
           </div>
         </section>

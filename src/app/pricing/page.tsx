@@ -178,7 +178,7 @@ export default async function PricingPage() {
             Running a bigger deployment? Credentials, tickets, and content licensing are priced separately.
           </p>
           <Button asChild variant="outline" size="lg">
-            <Link href="/enterprise">See enterprise pricing</Link>
+            <Link href="/services">See all services</Link>
           </Button>
         </section>
       </div>

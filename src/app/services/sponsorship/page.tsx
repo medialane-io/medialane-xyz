@@ -3,46 +3,53 @@ import type { Metadata } from "next"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import { FeatureRowList, type FeatureRowItem } from "@/src/components/marketing/feature-row-list"
-import { Layers, Package, Mail, ArrowLeft } from "lucide-react"
+import { Handshake, ShieldCheck, Gavel, Mail, ArrowLeft } from "lucide-react"
 import { pageMetadata } from "@/src/lib/seo"
 
 export const metadata: Metadata = pageMetadata({
-  title: "Limited Editions",
-  description: "Controlled-supply releases and timed drops. Release a work in as many numbered copies as you choose, each carrying the same provenance back to the original.",
-  path: "/enterprise/editions",
+  title: "Sponsorship",
+  description: "Structured sponsorship deals between a brand and a rights holder, settled automatically the moment a sponsor's bid is accepted, no escrow.",
+  path: "/services/sponsorship",
 })
 
 const ITEMS: FeatureRowItem[] = [
   {
-    icon: Layers,
-    eyebrow: "Limited Editions",
-    color: "bg-brand-purple",
-    title: "Numbered copies, set by you",
-    description: "Release a work in as many numbered copies as you choose. Fans collect and trade them; every copy carries the same provenance back to your original.",
+    icon: Handshake,
+    eyebrow: "Direct settlement",
+    color: "bg-brand-blue",
+    title: "Sponsor an asset, receive a license",
+    description: "A sponsor bids on an asset you own; you accept; they receive a license and payment settles directly between the two of you, the moment the deal is accepted.",
   },
   {
-    icon: Package,
-    eyebrow: "Collection Drop",
-    color: "bg-brand-blue",
-    title: "A timed release with a price and a window",
-    description: "Set a price, a supply, and a start and end time. Collectors purchase directly from a branded drop page on their own schedule.",
+    icon: Gavel,
+    eyebrow: "Open or invited",
+    color: "bg-brand-orange",
+    title: "Open bidding, or one invited sponsor",
+    description: "Run it as an open offer anyone can bid on, or start a deal with one sponsor directly. Either side can propose the terms.",
+  },
+  {
+    icon: ShieldCheck,
+    eyebrow: "Owner-verified",
+    color: "bg-brand-rose",
+    title: "Only the owner can accept",
+    description: "Only the asset's owner can accept a bid, and the license issues automatically the moment they do.",
   },
 ]
 
-export default function EditionsPage() {
+export default function SponsorshipPage() {
   return (
     <div className="relative w-full overflow-hidden">
       <div className="relative z-10">
         <section className="container mx-auto px-4 pt-28 pb-16 max-w-3xl text-center space-y-5">
           <Badge className="bg-primary/10 text-primary border-primary/30 px-4 py-1.5 text-sm">
-            Limited Editions
+            Sponsorship
           </Badge>
           <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-            Scarcity you actually control
+            Let a sponsor back your work directly
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Two live services cover this: numbered editions of an existing work, and timed drops
-            of a new one.
+            Built on IP Sponsorship, live on Medialane today: a song, an artwork, or a patent can
+            take a sponsorship offer in exchange for a license, settled asset-to-asset.
           </p>
         </section>
 
@@ -52,7 +59,7 @@ export default function EditionsPage() {
 
         <section className="container mx-auto px-4 pb-24 max-w-2xl text-center space-y-4">
           <Button asChild variant="ghost" size="sm">
-            <Link href="/enterprise"><ArrowLeft className="w-4 h-4 mr-1.5" />All Enterprise services</Link>
+            <Link href="/services"><ArrowLeft className="w-4 h-4 mr-1.5" />All services</Link>
           </Button>
           <div>
             <Button asChild variant="gradient-fill" className="from-brand-blue to-brand-maeve" size="lg">

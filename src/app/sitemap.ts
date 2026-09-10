@@ -7,19 +7,18 @@ const TOP_LEVEL_ROUTES = [
     '/services',
     '/developers',
     '/pricing',
-    '/enterprise',
     '/infrastructure',
     '/agents',
 ]
 
 const ENTERPRISE_SUB_ROUTES = [
-    '/enterprise/tokenize',
-    '/enterprise/ip',
-    '/enterprise/tickets',
-    '/enterprise/clubs',
-    '/enterprise/editions',
-    '/enterprise/sponsorship',
-    '/enterprise/ai-data',
+    '/services/tokenize',
+    '/services/ip',
+    '/services/tickets',
+    '/services/club',
+    '/services/nfteditions',
+    '/services/sponsorship',
+    '/services/ai-data',
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -142,7 +142,7 @@ export default function Home() {
               </Link>
             </Button>
             <Button asChild variant="gradient-border" size="sm">
-              <Link href="/enterprise/ip">
+              <Link href="/services/ip">
                 <Globe className="w-3.5 h-3.5 mr-1.5" />
                 Protect your IP worldwide
               </Link>
@@ -195,7 +195,7 @@ export default function Home() {
                 ))}
               </div>
               <Button asChild variant="gradient-border" size="sm">
-                <Link href="/enterprise/ai-data">
+                <Link href="/services/ai-data">
                   See how AI data compliance works
                   <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                 </Link>
@@ -223,7 +223,7 @@ export default function Home() {
           </div>
           <div className="text-center mt-8">
             <Button asChild variant="gradient-border" size="sm">
-              <Link href="/enterprise/ip">
+              <Link href="/services/ip">
                 See how IP protection works
                 <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
               </Link>

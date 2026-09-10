@@ -9,7 +9,7 @@ import { pageMetadata } from "@/src/lib/seo"
 export const metadata: Metadata = pageMetadata({
   title: "AI Data & Training",
   description: "Turn catalog access for AI training into a recurring revenue line, with license terms and provenance that travel with every asset, compliant with international copyright law.",
-  path: "/enterprise/ai-data",
+  path: "/services/ai-data",
 })
 
 const ITEMS: FeatureRowItem[] = [
@@ -67,7 +67,7 @@ export default function AiDataPage() {
 
         <section className="container mx-auto px-4 pb-24 max-w-2xl text-center space-y-4">
           <Button asChild variant="ghost" size="sm">
-            <Link href="/enterprise"><ArrowLeft className="w-4 h-4 mr-1.5" />All Enterprise services</Link>
+            <Link href="/services"><ArrowLeft className="w-4 h-4 mr-1.5" />All services</Link>
           </Button>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild variant="gradient-fill" className="from-brand-blue to-brand-maeve" size="lg">

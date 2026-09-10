@@ -13,7 +13,7 @@ import { pageMetadata } from "@/src/lib/seo"
 export const metadata: Metadata = pageMetadata({
   title: "Tokenization for IP",
   description: "Protect creative work worldwide: proof of authorship in minutes, plus licensing and catalog tracking, including for AI training use.",
-  path: "/enterprise/ip",
+  path: "/services/ip",
 })
 
 const FEATURES: FeatureRowItem[] = [
@@ -216,7 +216,7 @@ export default function IpProtectionPage() {
 
         <section className="container mx-auto px-4 pb-24 max-w-2xl text-center space-y-4">
           <Button asChild variant="ghost" size="sm">
-            <Link href="/enterprise"><ArrowLeft className="w-4 h-4 mr-1.5" />All Enterprise services</Link>
+            <Link href="/services"><ArrowLeft className="w-4 h-4 mr-1.5" />All services</Link>
           </Button>
           <div>
             <Button asChild variant="gradient-fill" className="from-brand-blue to-brand-maeve" size="lg">
