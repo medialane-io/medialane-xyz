@@ -7,6 +7,7 @@ import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Textarea } from "@/src/components/ui/textarea";
+import { CollectionPicker } from "@/src/components/portal/collection-picker";
 import {
   parseRecipients,
   invalidRecipients,
@@ -104,20 +105,17 @@ export function IssuanceTask({ serviceId, address }: { serviceId: string; addres
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="name">Asset name</Label>
-          <Input id="name" value={name} onChange={(e) => setName(e.target.value)} disabled={busy} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="collection">Collection</Label>
-          <Input
-            id="collection"
-            value={collectionId}
-            onChange={(e) => setCollectionId(e.target.value)}
-            disabled={busy}
-          />
-        </div>
+      <CollectionPicker
+        serviceId={serviceId}
+        owner={address}
+        value={collectionId}
+        onChange={setCollectionId}
+        disabled={busy}
+      />
+
+      <div className="space-y-2">
+        <Label htmlFor="name">Asset name</Label>
+        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} disabled={busy} />
       </div>
 
       <div className="space-y-2">

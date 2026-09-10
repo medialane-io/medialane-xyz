@@ -61,6 +61,26 @@ async function handler(req: NextRequest, context: { params: Promise<{ path: stri
     return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
   }
 
+  if (resource === "collections" && req.method === "GET") {
+    const qs = new URLSearchParams({ chain: "STARKNET", owner: session.address, limit: "100" });
+    const service = req.nextUrl.searchParams.get("service");
+    if (service) qs.set("service", service);
+    const upstream = await rawFetch(`/v1/collections?${qs.toString()}`, session.apiKey);
+    return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
+  }
+
+  if (resource === "intents") {
+    const rest = path.slice(1).join("/");
+    if (rest !== "build") {
+      return NextResponse.json({ error: "Not allowed through this proxy" }, { status: 403 });
+    }
+    const upstream = await rawFetch("/v1/intents/build", session.apiKey, {
+      method: req.method,
+      body,
+    });
+    return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
+  }
+
   if (resource === "issuance") {
     const rest = path.slice(1).join("/");
     if (rest !== "mint-calls") {
