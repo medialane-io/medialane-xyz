@@ -1,34 +1,32 @@
 import { test, expect } from "bun:test";
-import { issuableServices, issuableService, canIssue } from "./services";
+import { issuableServices, issuableService, canIssueToAList } from "./services";
 import { getService } from "@medialane/sdk";
 
-test("a task can target any service the registry says can mint", () => {
-  const ids = issuableServices().map((s) => s.id);
-  expect(ids).toContain("ip-erc721");
-  expect(ids).toContain("mip-erc721");
-  expect(ids).toContain("ip-tickets");
-  expect(ids).toContain("ip-club");
+test("offers the services whose mint takes a collection and a token uri", () => {
+  expect(issuableServices().map((s) => s.id).sort()).toEqual(["ip-erc721", "mip-erc721"]);
 });
 
-test("marketplaces cannot be issued through", () => {
-  const ids = issuableServices().map((s) => s.id);
-  expect(ids).not.toContain("medialane-marketplace-erc721");
-  expect(ids).not.toContain("medialane-marketplace-erc1155");
+test("leaves out services that need an edition size", () => {
+  expect(canIssueToAList(getService("mip-erc1155")!)).toBe(false);
 });
 
-test("external services cannot be issued through", () => {
-  const ids = issuableServices().map((s) => s.id);
-  expect(ids.some((id) => id.startsWith("external-"))).toBe(false);
-  expect(ids).not.toContain("unruggable-erc20");
+test("leaves out services that need a tier created first", () => {
+  expect(canIssueToAList(getService("ip-tickets")!)).toBe(false);
+  expect(canIssueToAList(getService("ip-club")!)).toBe(false);
 });
 
-test("a service without mint is excluded", () => {
-  expect(canIssue(getService("ip-sponsorship")!)).toBe(false);
-  expect(canIssue(getService("creator-coin")!)).toBe(false);
-  expect(canIssue(getService("drop-collection")!)).toBe(false);
+test("leaves out services that cannot mint at all", () => {
+  expect(canIssueToAList(getService("medialane-marketplace-erc721")!)).toBe(false);
+  expect(canIssueToAList(getService("ip-sponsorship")!)).toBe(false);
+  expect(canIssueToAList(getService("creator-coin")!)).toBe(false);
 });
 
-test("every targetable service can be rendered", () => {
+test("leaves out external services", () => {
+  expect(canIssueToAList(getService("external-erc721")!)).toBe(false);
+  expect(canIssueToAList(getService("unruggable-erc20")!)).toBe(false);
+});
+
+test("every offered service can be rendered", () => {
   for (const service of issuableServices()) {
     expect(service.displayName.length).toBeGreaterThan(0);
     expect(service.description.length).toBeGreaterThan(0);
@@ -37,11 +35,6 @@ test("every targetable service can be rendered", () => {
 
 test("resolving by id honours the same rule", () => {
   expect(issuableService("ip-erc721")?.id).toBe("ip-erc721");
-  expect(issuableService("medialane-marketplace-erc721")).toBeUndefined();
+  expect(issuableService("ip-tickets")).toBeUndefined();
   expect(issuableService("nonsense")).toBeUndefined();
-});
-
-test("the rule reads the definition rather than a hardcoded list", () => {
-  expect(canIssue(getService("ip-tickets")!)).toBe(true);
-  expect(canIssue(getService("external-erc721")!)).toBe(false);
 });
