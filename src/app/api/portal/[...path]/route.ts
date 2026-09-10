@@ -49,6 +49,18 @@ async function handler(req: NextRequest, context: { params: Promise<{ path: stri
     return NextResponse.json({ data: { keys: (keys.json as { data?: unknown[] })?.data ?? [] } });
   }
 
+  if (resource === "paymaster") {
+    const rest = path.slice(1).join("/");
+    if (rest !== "deploy/build") {
+      return NextResponse.json({ error: "Not allowed through this proxy" }, { status: 403 });
+    }
+    const upstream = await rawFetch(`/v1/paymaster/${rest}`, session.apiKey, {
+      method: req.method,
+      body,
+    });
+    return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
+  }
+
   if (resource === "provisioning") {
     const rest = path.slice(1).join("/");
     const upstream = await rawFetch(

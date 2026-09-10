@@ -1,4 +1,5 @@
-import { deriveOwnerKeyPair, computeAccountAddress } from "@medialane/sdk/starknet";
+import { deriveOwnerKeyPair, computeAccountAddress, signWithPrivateKey } from "@medialane/sdk/starknet";
+import { typedData as starknetTypedData } from "starknet";
 
 export const PROVISIONING_SECRET_MESSAGE = "medialane://business-provisioning/interim-key/v1";
 
@@ -42,4 +43,39 @@ export function interimKeyFor(secret: Uint8Array, recipient: Recipient, salt: st
     `${recipient.scheme}:${recipient.value}:${salt}`,
   );
   return { privateKey, publicKey, walletAddress: computeAccountAddress(publicKey, 0) };
+}
+
+export interface SignedDeployment {
+  typedData: unknown;
+  signature: string[];
+  deployment: unknown;
+}
+
+export async function buildAndSignDeployment(
+  address: string,
+  interim: { privateKey: string; publicKey: string; walletAddress: string },
+): Promise<SignedDeployment> {
+  const res = await fetch(`/api/portal/paymaster/deploy/build?address=${address}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ownerPubkey: interim.publicKey,
+      ownerAddress: interim.walletAddress,
+    }),
+  });
+
+  if (!res.ok) {
+    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(body.error ?? "Could not prepare the wallet deployment.");
+  }
+
+  const { typedData, deployment } = (await res.json()) as {
+    typedData: unknown;
+    deployment: unknown;
+  };
+
+  const msgHash = starknetTypedData.getMessageHash(typedData as never, interim.walletAddress);
+  const signature = signWithPrivateKey(interim.privateKey, msgHash);
+
+  return { typedData, signature, deployment };
 }

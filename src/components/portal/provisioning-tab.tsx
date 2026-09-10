@@ -15,6 +15,7 @@ import {
   invalidRecipients,
   interimKeyFor,
   newDerivationSalt,
+  buildAndSignDeployment,
   PROVISIONING_SECRET_MESSAGE,
   type Recipient,
 } from "@/src/lib/provisioning";
@@ -184,7 +185,8 @@ async function provisionOne(
   address: string,
 ): Promise<boolean> {
   const derivationSalt = newDerivationSalt();
-  const { publicKey, walletAddress } = interimKeyFor(secret, recipient, derivationSalt);
+  const interim = interimKeyFor(secret, recipient, derivationSalt);
+  const deployment = await buildAndSignDeployment(address, interim);
 
   const res = await fetch(`/api/portal/provisioning?address=${address}`, {
     method: "POST",
@@ -192,9 +194,9 @@ async function provisionOne(
     body: JSON.stringify({
       recipientScheme: recipient.scheme,
       recipientValue: recipient.value,
-      interimOwnerPubkey: publicKey,
-      walletAddress,
+      interimOwnerPubkey: interim.publicKey,
       derivationSalt,
+      deployment,
     }),
   });
 
