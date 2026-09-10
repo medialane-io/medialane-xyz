@@ -61,6 +61,30 @@ async function handler(req: NextRequest, context: { params: Promise<{ path: stri
     return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
   }
 
+  if (resource === "issuance") {
+    const rest = path.slice(1).join("/");
+    if (rest !== "mint-calls") {
+      return NextResponse.json({ error: "Not allowed through this proxy" }, { status: 403 });
+    }
+    const upstream = await rawFetch("/v1/business/issuance/mint-calls", session.apiKey, {
+      method: req.method,
+      body,
+    });
+    return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
+  }
+
+  if (resource === "metadata") {
+    const rest = path.slice(1).join("/");
+    if (rest !== "upload") {
+      return NextResponse.json({ error: "Not allowed through this proxy" }, { status: 403 });
+    }
+    const upstream = await rawFetch("/v1/metadata/upload", session.apiKey, {
+      method: req.method,
+      body,
+    });
+    return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
+  }
+
   if (resource === "provisioning") {
     const rest = path.slice(1).join("/");
     const upstream = await rawFetch(
