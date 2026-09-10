@@ -3,7 +3,6 @@
 import { use } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { usePortalAuth } from "@/src/hooks/use-portal-auth";
 import { launchpadService } from "@/src/lib/services";
 import { IssuanceTask } from "@/src/components/portal/issuance-task";
@@ -28,19 +27,7 @@ export default function LaunchpadServicePage({ params }: { params: Promise<{ ser
   }
 
   return (
-    <div className="container mx-auto px-4 max-w-3xl pt-28 pb-16">
-      <Link
-        href="/launchpad"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Launchpad
-      </Link>
-
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">{service.displayName}</h1>
-      </div>
-
+    <div className="pt-20">
       <IssuanceTask serviceId={service.id} address={session.address} />
     </div>
   );

@@ -30,6 +30,16 @@ async function handler(req: NextRequest, context: { params: Promise<{ path: stri
     return NextResponse.json({ error: "Invalid path" }, { status: 400 });
   }
   const [resource, id] = path;
+  if (resource === "metadata" && path[1] === "upload-file" && req.method === "POST") {
+    const upstream = await fetch(`${apiUrl}/v1/metadata/upload-file`, {
+      method: "POST",
+      headers: { "x-api-key": session.apiKey },
+      body: await req.formData(),
+    });
+    const uploaded = await upstream.json().catch(() => null);
+    return NextResponse.json(uploaded ?? {}, { status: upstream.status });
+  }
+
   const body = req.method !== "GET" && req.method !== "HEAD" ? await req.text() : undefined;
 
   if (resource === "credits" && !id && req.method === "GET") {
@@ -95,7 +105,7 @@ async function handler(req: NextRequest, context: { params: Promise<{ path: stri
 
   if (resource === "metadata") {
     const rest = path.slice(1).join("/");
-    if (rest !== "upload") {
+    if (rest !== "upload" && rest !== "upload-file") {
       return NextResponse.json({ error: "Not allowed through this proxy" }, { status: 403 });
     }
     const upstream = await rawFetch("/v1/metadata/upload", session.apiKey, {
