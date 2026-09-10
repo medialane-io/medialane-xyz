@@ -105,6 +105,20 @@ export function AccountDashboard({ address }: Props) {
       </div>
 
       <div className="container mx-auto px-4 max-w-5xl pb-16 space-y-4">
+        <Link
+          href="/launchpad"
+          className="group block rounded-2xl bg-brand-blue p-8 text-white transition-opacity hover:opacity-95"
+        >
+          <p className="text-2xl sm:text-3xl font-bold">Launchpad</p>
+          <p className="mt-2 max-w-lg text-white/80">
+            Give us a list of people. Everyone gets an account, a wallet, and the asset.
+          </p>
+          <span className="mt-5 inline-flex items-center text-sm font-medium">
+            Start
+            <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </Link>
+
         <div className="rounded-2xl border border-brand-purple p-8">
           <p className="text-xs text-muted-foreground mb-2">Credits balance</p>
           <p className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums mb-6">

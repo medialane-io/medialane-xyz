@@ -18,7 +18,8 @@ export const NAV_COMMANDS: NavCommandGroup[] = [
     items: [
       { id: "home", label: "Medialane", icon: Home, href: "/", keywords: ["home", "frontpage", "start"], description: "Start here" },
       { id: "platform", label: "Platform", icon: LayoutGrid, href: "/platform", keywords: ["how it works", "overview", "architecture"], description: "How Medialane works" },
-      { id: "services", label: "Services", icon: Rocket, href: "/services", keywords: ["launchpad", "issue", "create"], description: "Everything you can issue" },
+      { id: "launchpad", label: "Launchpad", icon: Rocket, href: "/launchpad", keywords: ["issue", "mint", "tokenize", "batch", "recipients", "list"], description: "Issue to a list of people" },
+      { id: "services", label: "Services", icon: LayoutGrid, href: "/services", keywords: ["catalogue", "what we offer", "browse"], description: "Everything you can issue" },
       { id: "account", label: "Account", icon: Wallet, href: "/account", keywords: ["api keys", "credits", "usage", "dashboard"], description: "Your API keys, credits & usage" },
     ],
   },

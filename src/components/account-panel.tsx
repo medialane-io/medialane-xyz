@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   AlertCircle, ChevronRight, Copy, ExternalLink,
-  LayoutDashboard, LogOut, Wallet,
+  LayoutDashboard,
+  Rocket, LogOut, Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAccount } from "@starknet-react/core";
@@ -83,6 +84,18 @@ export function AccountPanel() {
       </div>
 
       <div className="space-y-1">
+        <Link
+          href="/launchpad"
+          onClick={close}
+          className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/40"
+        >
+          <ChipIcon>
+            <Rocket className="h-4 w-4" />
+          </ChipIcon>
+          <span className="min-w-0 flex-1 truncate text-sm font-medium">Launchpad</span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/50" />
+        </Link>
+
         <div className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/40">
           <Link href="/account" onClick={close} className="flex min-w-0 flex-1 items-center gap-3">
             <ChipIcon>
