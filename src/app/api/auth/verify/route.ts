@@ -31,8 +31,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid address" }, { status: 400 });
   }
 
-  // Wallet signature is the only proof required — the backend self-provisions
-  // this wallet's Account + ApiClient, no admin credential involved.
   const verifyRes = await fetch(`${apiUrl}/v1/auth/siws/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-api-key": apiKey },
@@ -57,8 +55,6 @@ export async function POST(req: NextRequest) {
   }
   const { token, accountId, apiClientId } = verifyJson;
 
-  // Mint a fresh session-scoped API key, proven only by the SIWS bearer token
-  // we just earned by signing — still no shared/admin secret.
   const keyRes = await fetch(`${apiUrl}/v1/auth/siws/keys`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-api-key": apiKey, Authorization: `Bearer ${token}` },

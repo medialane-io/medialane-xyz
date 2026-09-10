@@ -28,8 +28,6 @@ async function handler(req: NextRequest, context: { params: Promise<{ path: stri
   const [resource, id] = path;
   const body = req.method !== "GET" && req.method !== "HEAD" ? await req.text() : undefined;
 
-  // The frontend's /api/portal/{credits,usage} views predate /v1/portal's shape —
-  // adapt them here rather than reshaping the real self-service API for two callers.
   if (resource === "credits" && !id && req.method === "GET") {
     const [me, history] = await Promise.all([
       backendFetch("me", session.apiKey),

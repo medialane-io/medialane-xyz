@@ -22,10 +22,7 @@ const queryClient = new QueryClient({
 
 export default function StarknetProviderWrapper({ children }: { children: ReactNode }) {
   const providerFactory = useMemo(() => {
-    // Only the metered proxy. A public RPC used to sit behind it as a
-    // fallback, but failover fires on exactly the responses the meter returns
-    // when it refuses — 429 and 402 — so hitting a limit silently moved every
-    // chain read onto a free endpoint instead of stopping it.
+
     return () => new RpcProvider({ nodeUrl: RPC_PROXY_PATH });
   }, []);
 
