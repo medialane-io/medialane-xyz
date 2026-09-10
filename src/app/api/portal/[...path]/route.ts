@@ -17,6 +17,16 @@ async function rawFetch(path: string, apiKey: string, init?: RequestInit) {
 }
 
 async function handler(req: NextRequest, context: { params: Promise<{ path: string[] }> }) {
+  try {
+    return await route(req, context);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("portal proxy failed", { message, stack: err instanceof Error ? err.stack : null });
+    return NextResponse.json({ error: `Proxy failed: ${message}` }, { status: 500 });
+  }
+}
+
+async function route(req: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const session = await getPortalSession();
   if (!session) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });

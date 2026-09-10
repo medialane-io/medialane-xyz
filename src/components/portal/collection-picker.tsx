@@ -43,10 +43,13 @@ export function CollectionPicker({
   disabled?: boolean;
 }) {
   const { account } = useAccount();
-  const { data, isLoading, mutate } = useSWR<{
+  const { data, isLoading, error: loadError, mutate } = useSWR<{
     collections?: CollectionOption[];
     data?: CollectionOption[];
-  }>(`/api/portal/collections?service=${serviceId}`, portalFetcher);
+  }>(`/api/portal/collections?service=${serviceId}`, portalFetcher, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+  });
 
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -104,6 +107,22 @@ export function CollectionPicker({
       <div className="space-y-2">
         <Label>Collection *</Label>
         <Skeleton className="h-[4.25rem] rounded-xl" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="space-y-2">
+        <Label>Collection *</Label>
+        <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 space-y-3">
+          <p className="text-sm text-destructive">
+            {loadError instanceof Error ? loadError.message : "Could not load your collections."}
+          </p>
+          <Button size="sm" variant="outline" onClick={() => mutate()}>
+            Try again
+          </Button>
+        </div>
       </div>
     );
   }
