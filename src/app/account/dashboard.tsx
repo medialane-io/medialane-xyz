@@ -3,7 +3,7 @@
 import { useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
-import { Key, BarChart2, Coins, ArrowRight, Plus } from "lucide-react";
+import { Key, BarChart2, Coins, Users, ArrowRight, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/src/hooks/use-wallet";
 import { usePortalAuth } from "@/src/hooks/use-portal-auth";
@@ -68,6 +68,8 @@ export function AccountDashboard({ address }: Props) {
   const [depositOpen, setDepositOpen] = useState(false);
 
   const { data: keysData } = useSWR<{ data: ApiKey[] }>(`/api/portal/keys?address=${address}`, portalFetcher);
+  const { data: provisioningData } = useSWR<{ data: unknown[] }>(`/api/portal/provisioning?address=${address}`, portalFetcher);
+  const provisioned = provisioningData?.data ?? [];
   const { data: creditsData, mutate: mutateCredits } = useSWR<CreditsData>(`/api/portal/credits?address=${address}`, portalFetcher);
 
   async function handleSignOut() {
@@ -119,7 +121,7 @@ export function AccountDashboard({ address }: Props) {
           </Button>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatLink
             href="/account/keys"
             icon={Key}
@@ -146,6 +148,15 @@ export function AccountDashboard({ address }: Props) {
             value={topUps}
             label="Top-ups"
             subtitle="See usage metered per call, per key"
+          />
+          <StatLink
+            href="/account/provisioning"
+            icon={Users}
+            border="border-brand-purple"
+            fg="text-brand-purple"
+            value={provisioned.length}
+            label="Accounts"
+            subtitle="Provision accounts and wallets for your users"
           />
         </div>
       </div>

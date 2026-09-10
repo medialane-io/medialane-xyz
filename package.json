@@ -11,7 +11,7 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@medialane/sdk": "0.106.0",
+    "@medialane/sdk": "0.110.0",
     "@medialane/ui": "0.126.9",
     "@radix-ui/react-avatar": "1.1.2",
     "@radix-ui/react-progress": "latest",

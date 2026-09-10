@@ -4,7 +4,11 @@ import { getPortalSession } from "@/src/lib/portal-session";
 const apiUrl = process.env.MEDIALANE_API_URL;
 
 async function backendFetch(subpath: string, apiKey: string, init?: RequestInit) {
-  const res = await fetch(`${apiUrl}/v1/portal/${subpath}`, {
+  return rawFetch(`/v1/portal/${subpath}`, apiKey, init);
+}
+
+async function rawFetch(path: string, apiKey: string, init?: RequestInit) {
+  const res = await fetch(`${apiUrl}${path}`, {
     ...init,
     headers: { "x-api-key": apiKey, "Content-Type": "application/json", ...(init?.headers ?? {}) },
   });
@@ -43,6 +47,16 @@ async function handler(req: NextRequest, context: { params: Promise<{ path: stri
     const keys = await backendFetch("keys", session.apiKey);
     if (keys.status >= 400) return NextResponse.json(keys.json ?? {}, { status: keys.status });
     return NextResponse.json({ data: { keys: (keys.json as { data?: unknown[] })?.data ?? [] } });
+  }
+
+  if (resource === "provisioning") {
+    const rest = path.slice(1).join("/");
+    const upstream = await rawFetch(
+      `/v1/business/provisioning${rest ? `/${rest}` : ""}`,
+      session.apiKey,
+      { method: req.method, body },
+    );
+    return NextResponse.json(upstream.json ?? {}, { status: upstream.status });
   }
 
   const subpath = path.join("/");
