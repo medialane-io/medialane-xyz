@@ -1,12 +1,20 @@
+import { listServices, getService, type ServiceDefinition } from "@medialane/sdk";
 
-export const SERVICE_IDS = [
-  "external-erc20",
-  "creator-coin",
-  "external-erc721",
-  "external-erc1155",
-  "mip-erc721",
-  "ip-erc721",
-  "mip-erc1155",
-  "pop-protocol",
-  "drop-collection",
-] as const;
+const COLLECTION_ID_MINT_SERVICES = new Set(["mip-erc721", "ip-erc721"]);
+
+export function canIssueToAList(service: ServiceDefinition): boolean {
+  return (
+    service.provenance === "MEDIALANE" &&
+    service.capabilities.includes("mint") &&
+    COLLECTION_ID_MINT_SERVICES.has(service.id)
+  );
+}
+
+export function issuableServices(): ServiceDefinition[] {
+  return listServices().filter(canIssueToAList);
+}
+
+export function issuableService(id: string): ServiceDefinition | undefined {
+  const service = getService(id);
+  return service && canIssueToAList(service) ? service : undefined;
+}
