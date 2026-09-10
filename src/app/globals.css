@@ -150,7 +150,6 @@
 .premium-glass {
   background: rgba(20, 20, 20, 0.6);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -271,7 +270,6 @@
 .nav-item-mobile {
   background: rgba(30, 30, 30, 0.8);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
