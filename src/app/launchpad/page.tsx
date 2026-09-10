@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { usePortalAuth } from "@/src/hooks/use-portal-auth";
-import { issuableServices } from "@/src/lib/services";
+import { launchpadServices } from "@/src/lib/services";
 
 export default function LaunchpadPage() {
   const { session, isLoading } = usePortalAuth();
-  const services = issuableServices();
+  const services = launchpadServices();
 
   if (isLoading) return null;
   if (!session) {
@@ -39,9 +39,6 @@ export default function LaunchpadPage() {
             className="group rounded-2xl border border-border/60 bg-card p-5 transition-colors hover:border-border"
           >
             <p className="font-semibold">{service.displayName}</p>
-            <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-              {service.description}
-            </p>
             <span className="mt-4 inline-flex items-center text-sm text-primary">
               Open
               <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />

@@ -1,40 +1,47 @@
 import { test, expect } from "bun:test";
-import { issuableServices, issuableService, canIssueToAList } from "./services";
+import { launchpadServices, launchpadService, isLaunchpadService } from "./services";
 import { getService } from "@medialane/sdk";
 
-test("offers the services whose mint takes a collection and a token uri", () => {
-  expect(issuableServices().map((s) => s.id).sort()).toEqual(["ip-erc721", "mip-erc721"]);
+test("the Launchpad offers Data Tokenization", () => {
+  expect(launchpadServices().map((s) => s.id)).toEqual(["data-tokenization-erc721"]);
 });
 
-test("leaves out services that need an edition size", () => {
-  expect(canIssueToAList(getService("mip-erc1155")!)).toBe(false);
+test("it is presented under its business name", () => {
+  expect(launchpadServices()[0]!.displayName).toBe("Data Tokenization");
 });
 
-test("leaves out services that need a tier created first", () => {
-  expect(canIssueToAList(getService("ip-tickets")!)).toBe(false);
-  expect(canIssueToAList(getService("ip-club")!)).toBe(false);
+test("it runs on its own factory, separate from IP Collection", () => {
+  const data = launchpadServices()[0]!;
+  expect(data.onchain?.STARKNET?.factoryAddress).toBe(
+    "0x07421b4442f7f2052c65408fb3561484154cf8175a0bbb41e3cd38d9087af6d2",
+  );
+  expect(data.onchain?.STARKNET?.factoryAddress).not.toBe(
+    getService("mip-erc721")!.onchain?.STARKNET?.factoryAddress,
+  );
 });
 
-test("leaves out services that cannot mint at all", () => {
-  expect(canIssueToAList(getService("medialane-marketplace-erc721")!)).toBe(false);
-  expect(canIssueToAList(getService("ip-sponsorship")!)).toBe(false);
-  expect(canIssueToAList(getService("creator-coin")!)).toBe(false);
-});
-
-test("leaves out external services", () => {
-  expect(canIssueToAList(getService("external-erc721")!)).toBe(false);
-  expect(canIssueToAList(getService("unruggable-erc20")!)).toBe(false);
-});
-
-test("every offered service can be rendered", () => {
-  for (const service of issuableServices()) {
-    expect(service.displayName.length).toBeGreaterThan(0);
-    expect(service.description.length).toBeGreaterThan(0);
+test("services built for the other apps stay out of the portal", () => {
+  for (const id of ["mip-erc721", "ip-erc721", "ip-tickets", "ip-club", "pop-protocol"]) {
+    expect(launchpadService(id)).toBeUndefined();
   }
 });
 
-test("resolving by id honours the same rule", () => {
-  expect(issuableService("ip-erc721")?.id).toBe("ip-erc721");
-  expect(issuableService("ip-tickets")).toBeUndefined();
-  expect(issuableService("nonsense")).toBeUndefined();
+test("marketplaces and external services are never offered", () => {
+  for (const id of ["medialane-marketplace-erc721", "external-erc721", "unruggable-erc20"]) {
+    expect(launchpadService(id)).toBeUndefined();
+  }
+});
+
+test("an offered service can always be rendered", () => {
+  for (const service of launchpadServices()) {
+    expect(service.displayName.length).toBeGreaterThan(0);
+  }
+});
+
+test("an unknown id resolves to nothing", () => {
+  expect(launchpadService("nonsense")).toBeUndefined();
+});
+
+test("a service must be able to mint to be offered", () => {
+  expect(isLaunchpadService(getService("medialane-marketplace-erc721")!)).toBe(false);
 });

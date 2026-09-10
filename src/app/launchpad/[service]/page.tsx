@@ -5,13 +5,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { usePortalAuth } from "@/src/hooks/use-portal-auth";
-import { issuableService } from "@/src/lib/services";
+import { launchpadService } from "@/src/lib/services";
 import { IssuanceTask } from "@/src/components/portal/issuance-task";
 
 export default function LaunchpadServicePage({ params }: { params: Promise<{ service: string }> }) {
   const { service: serviceId } = use(params);
   const { session, isLoading } = usePortalAuth();
-  const service = issuableService(serviceId);
+  const service = launchpadService(serviceId);
 
   if (!service) notFound();
   if (isLoading) return null;
@@ -39,7 +39,6 @@ export default function LaunchpadServicePage({ params }: { params: Promise<{ ser
 
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">{service.displayName}</h1>
-        <p className="mt-2 text-muted-foreground">{service.description}</p>
       </div>
 
       <IssuanceTask serviceId={service.id} address={session.address} />

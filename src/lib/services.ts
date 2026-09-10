@@ -1,20 +1,16 @@
 import { listServices, getService, type ServiceDefinition } from "@medialane/sdk";
 
-const COLLECTION_ID_MINT_SERVICES = new Set(["mip-erc721", "ip-erc721"]);
+const LAUNCHPAD_SERVICES = new Set(["data-tokenization-erc721"]);
 
-export function canIssueToAList(service: ServiceDefinition): boolean {
-  return (
-    service.provenance === "MEDIALANE" &&
-    service.capabilities.includes("mint") &&
-    COLLECTION_ID_MINT_SERVICES.has(service.id)
-  );
+export function isLaunchpadService(service: ServiceDefinition): boolean {
+  return LAUNCHPAD_SERVICES.has(service.id) && service.capabilities.includes("mint");
 }
 
-export function issuableServices(): ServiceDefinition[] {
-  return listServices().filter(canIssueToAList);
+export function launchpadServices(): ServiceDefinition[] {
+  return listServices().filter(isLaunchpadService);
 }
 
-export function issuableService(id: string): ServiceDefinition | undefined {
+export function launchpadService(id: string): ServiceDefinition | undefined {
   const service = getService(id);
-  return service && canIssueToAList(service) ? service : undefined;
+  return service && isLaunchpadService(service) ? service : undefined;
 }
